@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<link rel="preconnect" href="https://fonts.googleapis.com/">
+	<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+	<link href="/bootstrap.min.css" rel="stylesheet">
+
+	<link rel="stylesheet" href="/app.css">
+	<title>Demo Truyện</title>
+	<meta name="description"
+		content="Đọc truyện online, truyện hay. Demo Truyện luôn tổng hợp và cập nhật các chương truyện một cách nhanh nhất.">
+
+	<style>
+		.dark-theme {
+			background-color: #333 !important;
+			color: #fff !important;
+		}
+
+		.list-group-itemC img {
+			width: 50px;
+			height: 50px;
+			object-fit: cover;
+			border-radius: 4px;
+			margin-right: 10px;
+		}
+
+		.sidebar {
+			width: 300px;
+			padding: 20px;
+
+			border-right: 1px solid #ccc;
+			float: left;
+			height: 100vh;
+			box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+		}
+
+		.sidebar .avatar {
+			width: 150px;
+			height: 180px;
+			border: 1px solid #000;
+			margin-bottom: 20px;
+			margin-left: auto;
+			margin-right: auto;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			position: relative;
+			background-size: cover;
+			background-position: center;
+			cursor: pointer;
+			/* Thêm thuộc tính con trỏ */
+			border-radius: 150px;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+		}
+
+		.sidebar .avatar-text {
+			color: white;
+			text-align: center;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+
+			padding: 5px;
+			border-radius: 5px;
+		}
+
+		.sidebar .info {
+			font-size: 14px;
+			margin-bottom: 20px;
+		}
+
+		.sidebar .info-item {
+			border: 1px solid #ccc;
+			padding: 10px;
+			margin-bottom: 10px;
+
+			border-radius: 5px;
+		}
+
+		.content {
+			margin-left: 320px;
+			margin-top: 20px;
+			padding: 20px;
+			margin-right: 20px;
+
+			border-radius: 8px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+		}
+
+		.content .section {
+			border: 1px solid #ccc;
+			padding: 15px;
+			margin-bottom: 20px;
+			border-radius: 8px;
+
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+
+		.content .section-title {
+			font-size: 18px;
+			font-weight: bold;
+			margin-bottom: 10px;
+
+			display: flex;
+			justify-content: space-between;
+		}
+
+		.content .item {
+			border: 1px solid #007bff;
+			padding: 10px;
+			margin-bottom: 10px;
+			border-radius: 5px;
+
+			transition: background-color 0.3s, transform 0.3s;
+		}
+
+		.content .item:hover {
+			background-color: #e7f1ff;
+			transform: translateY(-2px);
+		}
+
+		.content .section .item .arrow {
+			color: red;
+			float: right;
+			margin-right: 10px;
+		}
+
+		.footer {
+			margin-top: 20px;
+			padding: 20px;
+
+			border-top: 1px solid #ccc;
+			text-align: center;
+		}
+
+		.footer .note {
+			font-size: 14px;
+			margin-bottom: 10px;
+		}
+
+		.footer .book {
+			display: flex;
+			align-items: center;
+		}
+
+		.footer .book img {
+			width: 50px;
+			height: 50px;
+			margin-right: 10px;
+		}
+
+		.show-stories {
+			max-height: 400px;
+			/* Chiều cao tối đa, điều chỉnh theo nhu cầu */
+			overflow-y: auto;
+			display: flex;
+			color: red;
+			font-size: 18px;
+			cursor: pointer;
+			margin-left: auto;
+			margin-right: 10px;
+		}
+
+		.show-bookshelf {
+			max-height: 400px;
+			/* Chiều cao tối đa, điều chỉnh theo nhu cầu */
+			overflow-y: auto;
+			display: flex;
+			color: red;
+			font-size: 18px;
+			cursor: pointer;
+			margin-left: auto;
+			margin-right: 10px;
+		}
+
+		.section-title span {
+			color: red;
+			font-size: 18px;
+			cursor: pointer;
+			margin-right: 10px;
+		}
+
+		.add-story-box {
+			border: 2px dashed #007bff;
+			color: #007bff;
+			font-size: 40px;
+			font-weight: bold;
+
+			align-items: center;
+			justify-content: center;
+		}
+
+
+		.content {
+			padding: 20px;
+		}
+
+		.section-title {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			font-weight: bold;
+			margin-bottom: 10px;
+		}
+
+		.toggle-stories-btn,
+		.toggle-bookshelf-btn {
+			cursor: pointer;
+			border: none;
+			background: none;
+			font-size: 18px;
+		}
+
+		.story-list {
+			max-height: 400px;
+			/* Chiều cao tối đa */
+			overflow-y: auto;
+			/* Cho phép cuộn dọc khi nội dung vượt quá chiều cao */
+			display: flex;
+			/* Chế độ flexbox */
+			flex-wrap: wrap;
+			/* Cho phép các phần tử con xuống dòng khi không đủ chỗ */
+			gap: 20px;
+			/* Khoảng cách giữa các phần tử */
+			padding: 10px;
+			/* Khoảng cách trong cùng phần tử cha */
+			width: 100%;
+		}
+
+		.bookshelf-list {
+			max-height: 400px;
+			/* Chiều cao tối đa */
+			overflow-y: auto;
+			/* Cho phép cuộn dọc khi nội dung vượt quá chiều cao */
+			display: flex;
+			/* Chế độ flexbox */
+			flex-wrap: wrap;
+			/* Cho phép các phần tử con xuống dòng khi không đủ chỗ */
+			gap: 20px;
+			/* Khoảng cách giữa các phần tử */
+			padding: 10px;
+			/* Khoảng cách trong cùng phần tử cha */
+			width: 100%;
+		}
+
+		.story-card {
+			display: flex;
+			/* Để sắp xếp ảnh và nội dung ngang hàng */
+			align-items: center;
+			/* Căn giữa nội dung theo chiều dọc */
+			width: 100%;
+			/* Để thẻ chiếm toàn bộ chiều rộng container */
+			border: 1px solid #ccc;
+			/* Tùy chọn, tạo đường viền */
+			padding: 10px;
+			/* Khoảng cách bên trong thẻ */
+			margin-bottom: 10px;
+			/* Khoảng cách giữa các thẻ */
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+			/* Đổ bóng nhẹ */
+		}
+
+		.story-card img {
+			width: 60px;
+			/* Đặt kích thước cho ảnh */
+			height: 80px;
+			margin-right: 15px;
+			/* Khoảng cách giữa ảnh và nội dung */
+		}
+
+		.story-content {
+			flex-grow: 1;
+			/* Để phần nội dung chiếm toàn bộ không gian còn lại */
+		}
+
+		.story-title {
+			font-size: 16px;
+			font-weight: bold;
+			margin: 0;
+		}
+
+		.story-chapter {
+			color: green;
+			font-size: 14px;
+			margin: 0;
+		}
+
+
+		.save-button {
+			display: inline;
+			/* Đảm bảo nút này được hiển thị */
+			z-index: 10;
+			/* Đảm bảo nút "Lưu" nằm trên các phần tử khác */
+		}
+
+
+		.info-item {
+			display: flex;
+			align-items: center;
+			margin-bottom: 10px;
+		}
+
+		.info-content {
+			display: flex;
+			align-items: center;
+			margin-left: 10px;
+			/* Khoảng cách giữa nhãn và nội dung */
+		}
+
+		.display-text {
+			margin-right: 10px;
+			/* Khoảng cách giữa văn bản hiển thị và trường nhập liệu */
+		}
+
+		.edit-input {
+			height: 30px;
+			/* Chiều cao của trường nhập liệu */
+			padding: 5px;
+			/* Padding cho trường nhập liệu */
+			border: 1px solid #ccc;
+			/* Đường viền cho trường nhập liệu */
+			border-radius: 4px;
+			/* Bo tròn góc cho trường nhập liệu */
+		}
+
+		.avatar-text {
+			opacity: 0;
+			transition: opacity 0.3s;
+		}
+
+		.avatar:hover .avatar-text {
+			opacity: 1;
+		}
+	</style>
+</head>
+
+<body>
+	<header class="header d-none d-lg-block">
+		<!-- place navbar here -->
+		<nav class="navbar navbar-expand-lg navbar-dark header__navbar p-md-0">
+			<div class="container">
+				<a class="navbar-brand" href="/">
+					<img src="images/logo.png" alt="Logo N13 Truyen" srcset="" class="img-fluid" style="width: 100px;">
+				</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+					data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+					aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarSupportedContent">
+					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"
+								aria-expanded="false">
+								Thể loại
+							</a>
+							<ul class="dropdown-menu dropdown-menu-custom" id="category-list">
+								<li><a class="dropdown-item" href="#" data-category="1">Ngôn Tình</a></li>
+								<li><a class="dropdown-item" href="#" data-category="2">Trọng Sinh</a></li>
+								<li><a class="dropdown-item" href="#" data-category="3">Cổ Đại</a></li>
+								<li><a class="dropdown-item" href="#" data-category="4">Tiên Hiệp</a></li>
+								<li><a class="dropdown-item" href="#" data-category="5">Ngược</a></li>
+								<li><a class="dropdown-item" href="#" data-category="6">Khác</a></li>
+								<li><a class="dropdown-item" href="#" data-category="7">Dị Giới</a></li>
+								<li><a class="dropdown-item" href="#" data-category="8">Huyền Huyễn</a></li>
+								<li><a class="dropdown-item" href="#" data-category="9">Xuyên Không</a></li>
+								<li><a class="dropdown-item" href="#" data-category="10">Sủng</a></li>
+								<li><a class="dropdown-item" href="#" data-category="11">Cung Đấu</a></li>
+								<li><a class="dropdown-item" href="#" data-category="12">Gia Đấu</a></li>
+							</ul>
+						</li>
+
+					</ul>
+
+
+					<div class="form-check form-switch me-3 d-flex align-items-center">
+						<label class="form-check-label">
+							<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
+								class="bi bi-brightness-high" viewBox="0 0 16 16" style="fill: #fff;">
+								<path
+									d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z">
+								</path>
+							</svg>
+						</label>
+						<input class="form-check-input theme_mode" type="checkbox"
+							style="transform: scale(1.3); margin-left: 12px; margin-right: 12px;">
+
+						<label class="form-check-label">
+							<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 384 512"
+								style="fill: #fff;">
+								<path
+									d="M144.7 98.7c-21 34.1-33.1 74.3-33.1 117.3c0 98 62.8 181.4 150.4 211.7c-12.4 2.8-25.3 4.3-38.6 4.3C126.6 432 48 353.3 48 256c0-68.9 39.4-128.4 96.8-157.3zm62.1-66C91.1 41.2 0 137.9 0 256C0 379.7 100 480 223.5 480c47.8 0 92-15 128.4-40.6c1.9-1.3 3.7-2.7 5.5-4c4.8-3.6 9.4-7.4 13.9-11.4c2.7-2.4 5.3-4.8 7.9-7.3c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-3.7 .6-7.4 1.2-11.1 1.6c-5 .5-10.1 .9-15.3 1c-1.2 0-2.5 0-3.7 0c-.1 0-.2 0-.3 0c-96.8-.2-175.2-78.9-175.2-176c0-54.8 24.9-103.7 64.1-136c1-.9 2.1-1.7 3.2-2.6c4-3.2 8.2-6.2 12.5-9c3.1-2 6.3-4 9.6-5.8c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-3.6-.3-7.1-.5-10.7-.6c-2.7-.1-5.5-.1-8.2-.1c-3.3 0-6.5 .1-9.8 .2c-2.3 .1-4.6 .2-6.9 .4z">
+								</path>
+							</svg>
+						</label>
+					</div>
+
+
+
+					<form class="d-flex header__form-search" action="" method="GET">
+						<input class="form-control search-story" type="text" placeholder="Tìm kiếm" name="key_word"
+							value="">
+						<div class="col-12 search-result shadow no-result d-none">
+							<div class="card text-white bg-light">
+								<div class="card-body p-0">
+									<ul class="list-group list-group-flush d-none">
+										<li class="list-group-item">
+											<a href="#" class="text-dark hover-title"></a>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+
+						<button class="btn" type="submit">
+							<svg xmlns="http://www.w3.org/2000/svg" height="1em"
+								viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
+								<path
+									d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z">
+								</path>
+							</svg>
+
+						</button>
+					</form>
+					<script>
+						document.querySelector('.search-story').addEventListener('input', async (e) => {
+							const keyword = e.target.value;
+
+							if (keyword.trim().length === 0) {
+								hideSearchResult();
+								return;
+							}
+
+							try {
+								const response = await fetch(`/search-stories?keyword=${encodeURIComponent(keyword)}`);
+								const stories = await response.json();
+
+								if (stories.length > 0) {
+									showSearchResult(stories);
+								} else {
+									showNoResult();
+								}
+							} catch (error) {
+								console.error('Lỗi khi tìm kiếm:', error);
+							}
+						});
+
+						function showSearchResult(stories) {
+							const resultContainer = document.querySelector('.search-result');
+							resultContainer.classList.remove('d-none');
+							const listGroup = resultContainer.querySelector('.list-group');
+							listGroup.classList.remove('d-none');
+							listGroup.innerHTML = '';
+
+							stories.forEach((story) => {
+								// Tạo thẻ item
+								const item = document.createElement('li');
+								item.className = 'list-group-itemC d-flex align-items-center';
+								item.setAttribute('data-id', story.id);
+
+								// Tạo thẻ img
+								const img = document.createElement('img');
+								img.src = story.srcA;
+								img.alt = story.title;
+								img.className = 'me-2';
+
+								// Tạo thẻ link
+								const link = document.createElement('a');
+								link.href = '#';
+								link.textContent = story.title;
+								link.className = 'text-dark hover-title';
+
+
+								link.addEventListener('click', async (e) => {
+									e.preventDefault();
+									console.log(`Truyện được chọn: ${story.title}`);
+
+									try {
+										const response = await fetch(`/story/${story.id}`);
+										const data = await response.json();
+										console.log('Dữ liệu chi tiết:', data);
+
+										localStorage.setItem('data', JSON.stringify(data));
+										window.location.href = '/story-details';
+									} catch (error) {
+										console.error('Lỗi khi lấy chi tiết truyện:', error);
+									}
+								});
+
+								item.appendChild(img);
+								item.appendChild(link);
+
+								// Gắn item vào danh sách
+								listGroup.appendChild(item);
+							});
+						}
+
+						function showNoResult() {
+							const resultContainer = document.querySelector('.search-result');
+							resultContainer.classList.remove('d-none'); // Hiển thị container
+							const listGroup = resultContainer.querySelector('.list-group');
+							listGroup.classList.remove('d-none');
+							listGroup.innerHTML = '';
+							const item = document.createElement('span');
+							item.style.color = 'black';
+							item.textContent = 'Không tìm thấy kết quả';
+
+
+							listGroup.appendChild(item);
+						}
+
+						function hideSearchResult() {
+							const resultContainer = document.querySelector('.search-result');
+							resultContainer.classList.add('d-none'); // Ẩn container
+						}
+					</script>
+					<li style="float:right;">
+						<span th:if="${session.user == null}">
+							<a href="/login" class="login-button"
+								style="display: inline-block; padding: 10px 20px; background-color: #007BFF; color: white; text-decoration: none; border-radius: 5px; margin-left: 10px;">Đăng
+								nhập</a>
+						</span>
+						<span th:if="${session.user != null}">
+							<a th:href="@{/account(userId=${session.userId})}" class="welcome-button">Chào mừng, <span
+									th:text="${session.user.firstName}"></span></a>
+							<a href="/logout" class="logout-button"
+								style="display: inline-block; padding: 10px 20px; background-color: #DC3545; color: white; text-decoration: none; border-radius: 5px; margin-left: 10px;">Đăng
+								xuất</a>
+						</span>
+					</li>
+
+				</div>
+			</div>
+		</nav>
+	</header>
+	<div class="header-mobile d-sm-block d-lg-none">
+		<nav class="navbar navbar-dark bg-dark">
+			<div class="container-fluid">
+				<a class="navbar-brand" href="index.html">
+					<img src="/images/logo.png" alt="Logo Truyen" srcset="" class="img-fluid" style="width: 100px;">
+				</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="offcanvas"
+					data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="offcanvas offcanvas-end text-bg-dark w-75" tabindex="-1" id="offcanvasDarkNavbar"
+					aria-labelledby="offcanvasDarkNavbarLabel">
+					<div class="offcanvas-header">
+						<img src="/images/logo.png" alt="Logo Truyen" srcset="" class="img-fluid" style="width: 100px;">
+						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
+							aria-label="Close"></button>
+					</div>
+					<div class="offcanvas-body">
+						<ul class="navbar-nav justify-content-end flex-grow-1 pe-3 mb-3">
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"
+									aria-expanded="false">
+									Thể loại
+								</a>
+								<ul class="dropdown-menu dropdown-menu-custom">
+									<li><a class="dropdown-item" data-category="13" href="#">Mạt Thế</a></li>
+									<li><a class="dropdown-item" data-category="14" href="#">Xuyên Nhanh</a></li>
+									<li><a class="dropdown-item" data-category="15" href="#">Hệ Thống</a></li>
+									<li><a class="dropdown-item" data-category="16" href="#">Nữ Cường</a></li>
+								</ul>
+							</li>
+
+						</ul>
+
+						<div class="form-check form-switch d-flex align-items-center mb-3 p-0">
+							<label class="form-check-label">
+								<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
+									class="bi bi-brightness-high" viewBox="0 0 16 16" style="fill: #fff;">
+									<path
+										d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z">
+									</path>
+								</svg>
+							</label>
+							<input class="form-check-input theme_mode" type="checkbox"
+								style="transform: scale(1.3); margin-left: 12px; margin-right: 12px;">
+
+							<label class="form-check-label">
+								<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 384 512"
+									style="fill: #fff;">
+									<path
+										d="M144.7 98.7c-21 34.1-33.1 74.3-33.1 117.3c0 98 62.8 181.4 150.4 211.7c-12.4 2.8-25.3 4.3-38.6 4.3C126.6 432 48 353.3 48 256c0-68.9 39.4-128.4 96.8-157.3zm62.1-66C91.1 41.2 0 137.9 0 256C0 379.7 100 480 223.5 480c47.8 0 92-15 128.4-40.6c1.9-1.3 3.7-2.7 5.5-4c4.8-3.6 9.4-7.4 13.9-11.4c2.7-2.4 5.3-4.8 7.9-7.3c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-3.7 .6-7.4 1.2-11.1 1.6c-5 .5-10.1 .9-15.3 1c-1.2 0-2.5 0-3.7 0c-.1 0-.2 0-.3 0c-96.8-.2-175.2-78.9-175.2-176c0-54.8 24.9-103.7 64.1-136c1-.9 2.1-1.7 3.2-2.6c4-3.2 8.2-6.2 12.5-9c3.1-2 6.3-4 9.6-5.8c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-3.6-.3-7.1-.5-10.7-.6c-2.7-.1-5.5-.1-8.2-.1c-3.3 0-6.5 .1-9.8 .2c-2.3 .1-4.6 .2-6.9 .4z">
+									</path>
+								</svg>
+							</label>
+						</div>
+
+						<form class="d-flex header__form-search" action="" method="GET">
+							<input class="form-control search-story" type="text" placeholder="Tìm kiếm" name="key_word"
+								value="">
+							<div class="col-12 search-result shadow no-result d-none">
+								<div class="card text-white bg-light">
+									<div class="card-body p-0">
+										<ul class="list-group list-group-flush d-none">
+											<li class="list-group-item">
+												<a href="#" class="text-dark hover-title"></a>
+											</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+
+							<button class="btn" type="submit">
+								<svg xmlns="http://www.w3.org/2000/svg" height="1em"
+									viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
+									<path
+										d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z">
+									</path>
+								</svg>
+
+							</button>
+						</form>
+						<script>
+							document.querySelector('.search-story').addEventListener('input', async (e) => {
+								const keyword = e.target.value;
+
+								if (keyword.trim().length === 0) {
+									hideSearchResult();
+									return;
+								}
+
+								try {
+									const response = await fetch(`/search-stories?keyword=${encodeURIComponent(keyword)}`);
+									const stories = await response.json();
+
+									if (stories.length > 0) {
+										showSearchResult(stories);
+									} else {
+										showNoResult();
+									}
+								} catch (error) {
+									console.error('Lỗi khi tìm kiếm:', error);
+								}
+							});
+
+							function showSearchResult(stories) {
+								const resultContainer = document.querySelector('.search-result');
+								resultContainer.classList.remove('d-none');
+								const listGroup = resultContainer.querySelector('.list-group');
+								listGroup.classList.remove('d-none');
+								listGroup.innerHTML = '';
+
+								stories.forEach((story) => {
+									// Tạo thẻ item
+									const item = document.createElement('li');
+									item.className = 'list-group-itemC d-flex align-items-center';
+									item.setAttribute('data-id', story.id);
+
+									// Tạo thẻ img
+									const img = document.createElement('img');
+									img.src = story.srcA;
+									img.alt = story.title;
+									img.className = 'me-2';
+
+									// Tạo thẻ link
+									const link = document.createElement('a');
+									link.href = '#';
+									link.textContent = story.title;
+									link.className = 'text-dark hover-title';
+
+
+									link.addEventListener('click', async (e) => {
+										e.preventDefault();
+										console.log(`Truyện được chọn: ${story.title}`);
+
+										try {
+											const response = await fetch(`/story/${story.id}`);
+											const data = await response.json();
+											console.log('Dữ liệu chi tiết:', data);
+
+											localStorage.setItem('data', JSON.stringify(data));
+											window.location.href = '/story-details';
+										} catch (error) {
+											console.error('Lỗi khi lấy chi tiết truyện:', error);
+										}
+									});
+
+									item.appendChild(img);
+									item.appendChild(link);
+
+									// Gắn item vào danh sách
+									listGroup.appendChild(item);
+								});
+							}
+
+							function showNoResult() {
+								const resultContainer = document.querySelector('.search-result');
+								resultContainer.classList.remove('d-none'); // Hiển thị container
+								const listGroup = resultContainer.querySelector('.list-group');
+								listGroup.classList.remove('d-none');
+								listGroup.innerHTML = '';
+								const item = document.createElement('span');
+								item.style.color = 'black';
+								item.textContent = 'Không tìm thấy kết quả';
+
+
+								listGroup.appendChild(item);
+							}
+
+							function hideSearchResult() {
+								const resultContainer = document.querySelector('.search-result');
+								resultContainer.classList.add('d-none'); // Ẩn container
+							}
+						</script>
+						<ul class="offcanvas-login" style="float: left;">
+							<li style="float:right;">
+								<span th:if="${session.user == null}">
+									<a href="/login" class="login-button"
+										style="display: inline-block; padding: 10px 20px; background-color: #007BFF; color: white; text-decoration: none; border-radius: 5px; margin-left: 10px;">Đăng
+										nhập</a>
+								</span>
+								<span th:if="${session.user != null}">
+									<a th:href="@{/account(userId=${session.userId})}" class="welcome-button">Chào mừng,
+										<span th:text="${session.user.firstName}"></span></a>
+									<a href="/logout" class="logout-button"
+										style="display: inline-block; padding: 10px 20px; background-color: #DC3545; color: white; text-decoration: none; border-radius: 5px; margin-left: 10px;">Đăng
+										xuất</a>
+								</span>
+							</li>
+						</ul>
+
+					</div>
+
+				</div>
+			</div>
+		</nav>
+	</div>
+
+
+	<div class="sidebar">
+		<div class="avatar" id="avatar" style="background-image: url('default-avatar.png');">
+			<div class="avatar-text" id="avatar-text">Ấn vào để tải lên ảnh đại diện</div>
+		</div>
+		<input type="file" id="file-input" style="display: none;" accept="image/*" />
+		<div class="info">
+			<div class="info-item" id="name">
+				<strong>Tên hiển thị:</strong>
+				<div class="info-content">
+					<span class="display-text" id="tenHienThi"></span>
+					<div id="tenHienThiInput" style="display: none;">
+						<input type="text" class="edit-input" id="firstName" placeholder="First Name" />
+						<input type="text" class="edit-input" id="lastName" placeholder="Last Name" />
+					</div>
+				</div>
+			</div>
+
+			<div class="info-item">
+				<strong>Số điện thoại:</strong>
+				<div class="info-content">
+					<span class="display-text" id="soDienThoai"></span>
+					<input type="tel" class="edit-input" id="soDienThoaiInput" style="display: none;" />
+				</div>
+			</div>
+			<div class="info-item">
+				<strong>Email:</strong>
+				<div class="info-content">
+					<span class="display-text" id="email"></span>
+					<input type="email" class="edit-input" id="emailInput" style="display: none;" />
+				</div>
+			</div>
+			<div class="info-item">
+				<strong>Giới tính:</strong>
+				<div class="info-content">
+					<span class="display-text" id="gioiTinh"></span>
+					<select class="edit-input" id="gioiTinhInput" style="display: none;">
+						<option value="nam">Nam</option>
+						<option value="nu">Nữ</option>
+						<option value="khac">Khác</option>
+					</select>
+				</div>
+			</div>
+			<div class="info-item">
+				<strong>Bút danh:</strong>
+				<div class="info-content">
+					<span class="display-text" id="butDanh"></span>
+					<input type="text" class="edit-input" id="butDanhInput" style="display: none;" />
+				</div>
+			</div>
+			<div class="info-item">
+				<strong>Năm sinh:</strong>
+				<div class="info-content">
+					<span class="display-text" id="namSinh"></span>
+					<input type="number" class="edit-input" id="namSinhInput" style="display: none;" />
+				</div>
+			</div>
+			<div>
+				<button id="edit-button" style="display: none;">Chỉnh sửa</button>
+				<button id="save-button" style="display: none;">Lưu</button>
+			</div>
+		</div>
+
+
+
+
+
+
+	</div>
+	<div class="content">
+		<div class="section">
+			<div class="section-title">
+				Truyện của <span th:text="${name}" style="margin-left: 10px;" id="truyencua"></span>
+				<button class="toggle-stories-btn">▶</button>
+			</div>
+			<div class="story-list" style="display: none;">
+
+			</div>
+		</div>
+
+		<div class="section">
+			<div class="section-title" id="bookshelf" style="display:none">
+				Tủ sách của <span th:text="${name}" style="margin-left: 10px;" id="tusach"></span>
+				<button class="toggle-bookshelf-btn">▶</button>
+			</div>
+			<div class="bookshelf-list" style="display: none;">
+				<!-- Danh sách tủ sách sẽ được load ở đây -->
+			</div>
+		</div>
+		<div class="story-list add-story-box" id="addStoryButton" style="display:none">
+			<span>+</span>
+		</div>
+	</div>
+
+	<script>
+
+		document.querySelectorAll('.dropdown-item').forEach(item => {
+			item.addEventListener('click', async function (event) {  // Thêm 'async' ở đây
+				event.preventDefault();  // Ngăn chặn hành động mặc định của thẻ <a>
+
+				const category = this.getAttribute('data-category');  // Lấy thể loại từ thuộc tính data-category
+
+				console.log("category:", category);
+
+				// Fetch dữ liệu truyện từ backend
+				try {
+					const response = await fetch(`/stories/${category}`);  // Thêm dấu backticks
+					const data = await response.json();
+
+					if (data) {
+						localStorage.setItem('stories', JSON.stringify(data.stories));
+						localStorage.setItem('idtl', JSON.stringify(data.idtl));
+						localStorage.setItem('TheLoai', JSON.stringify(data.TheLoai));
+						console.log(data);
+
+						window.location.href = '/category';
+
+					}
+				} catch (error) {
+					console.error("Error fetching stories:", error);
+				}
+			});
+		});
+
+
+		let userId = [[${ userId }]];;
+		sessionStorage.setItem("userId", userId);
+
+		let storiesData = null;
+		let bookshelfData = null;
+
+		function deleteFromBookshelf(storyId) {
+			console.log("ấn nút xóa khỏi tủ sách");
+			if (confirm('Bạn có chắc chắn muốn xóa truyện này?')) {
+				fetch(`/delete-story-from-bookshelf/${storyId}/${userId}`, {
+					method: 'DELETE',
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				})
+					.then(response => {
+						console.log("response: ", response);
+						if (response.ok) {
+							alert(`Đã xóa truyện có ID: ${storyId}`);
+							// Thực hiện cập nhật lại danh sách truyện trên trang nếu cần
+							location.reload(); // Tải lại trang để cập nhật danh sách
+						} else if (response.status === 404) {
+							alert(`Không tìm thấy truyện`);
+						} else {
+							alert('Đã xảy ra lỗi khi xóa truyện. Vui lòng thử lại sau.');
+						}
+					})
+					.catch(error => {
+						console.error('Lỗi:', error);
+						alert('Đã xảy ra lỗi kết nối.');
+					});
+			}
+		}
+
+		async function editStory(storyId) {
+			console.log("da bam vao edit:", storyId);
+			try {
+				// Gửi yêu cầu đến API để lấy thông tin truyện theo ID
+				const response = await fetch(`/story/${storyId}`);
+				const data = await response.json();
+				console.log("truyện đã được click:", data);
+				// Lưu thông tin truyện vào localStorage
+				localStorage.setItem('data', JSON.stringify(data));
+				// Chuyển hướng đến trang story.html với ID của truyện trong URL
+				window.location.href = `/chinh-sua-truyen`;
+			} catch (error) {
+				console.error('Lỗi khi lấy dữ liệu truyện:', error);
+			}
+		}
+		function deleteStory(storyId) {
+			console.log("ấn nút xóa");
+			if (confirm('Bạn có chắc chắn muốn xóa truyện này?')) {
+				fetch(`/delete-story/${storyId}`, {
+					method: 'DELETE',
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				})
+					.then(response => {
+						console.log("response: ", response);
+						if (response.ok) {
+							alert(`Đã xóa truyện có ID: ${storyId}`);
+							// Thực hiện cập nhật lại danh sách truyện trên trang nếu cần
+							location.reload(); // Tải lại trang để cập nhật danh sách
+						} else if (response.status === 404) {
+							alert(`Không tìm thấy truyện`);
+						} else {
+							alert('Đã xảy ra lỗi khi xóa truyện. Vui lòng thử lại sau.');
+						}
+					})
+					.catch(error => {
+						console.error('Lỗi:', error);
+						alert('Đã xảy ra lỗi kết nối.');
+					});
+			}
+		}
+		async function toggleStories() {
+			const storyListElement = document.querySelector('.story-list');
+			const toggleButton = document.querySelector('.toggle-stories-btn');
+
+			if (storyListElement.style.display === 'none') {
+				if (!storiesData) {
+					await loadStories();
+				}
+				storyListElement.style.display = 'flex';
+				toggleButton.textContent = '▼';
+			} else {
+				storyListElement.style.display = 'none';
+				toggleButton.textContent = '▶';
+			}
+		}
+		document.getElementById('addStoryButton').addEventListener('click', () => {
+			const apiUrl = '/them-truyen';
+			window.location.href = apiUrl;
+		});
+		async function toggleBookshelf() {
+			const bookshelfListElement = document.querySelector('.bookshelf-list');
+			const toggleButton = document.querySelector('.toggle-bookshelf-btn');
+
+			if (bookshelfListElement.style.display === 'none') {
+				if (!bookshelfData) {
+					await loadBookshelf();
+				}
+				bookshelfListElement.style.display = 'flex';
+				toggleButton.textContent = '▼';
+			} else {
+				bookshelfListElement.style.display = 'none';
+				toggleButton.textContent = '▶';
+			}
+		}
+
+		async function loadStories() {
+			try {
+				const response = await fetch(`/stories-of-user?userId=${userId}`);
+				console.log("userid:", userId);
+				storiesData = await response.json();
+
+				const storyListElement = document.querySelector('.story-list');
+				storyListElement.innerHTML = '';
+				console.log("data", storyListElement);
+				// Kiểm tra nếu storiesData không rỗng
+				if (storiesData.length > 0) {
+					// Duyệt qua danh sách book
+					storiesData.forEach((book) => {
+						const id = book.id;
+						const title = book.title;
+						const chapters = book.so_chuong;
+						const srcA = book.srcA;
+
+
+						const storyCard = createStoryCard({ id, title, chapters, srcA }, 1);
+						storyListElement.appendChild(storyCard);
+					});
+				} else {
+					storyListElement.innerHTML = '<p>Không có truyện nào.</p>';
+				}
+			} catch (error) {
+				console.error('Lỗi khi lấy danh sách truyện:', error);
+			}
+		}
+		function createStoryCard(story, n) {
+			const storyCard = document.createElement('div');
+			storyCard.classList.add('story-card');
+			console.log("stories", story);
+			// Thiết lập giao diện thẻ truyện
+			storyCard.style.display = 'flex';
+			storyCard.style.alignItems = 'center';
+			storyCard.style.border = '1px solid #ccc';
+			storyCard.style.padding = '10px';
+			storyCard.style.marginBottom = '10px';
+
+			// Tạo phần tử ảnh
+			const storyImage = document.createElement('img');
+			storyImage.src = story.srcA || '/default-image.jpg'; // Đặt ảnh mặc định nếu không có ảnh
+			storyImage.alt = story.title;
+			storyImage.style.width = '120px';
+			storyImage.style.height = '80px';
+			storyImage.style.marginRight = '10px';
+
+			// Tạo phần tử nội dung để chứa tiêu đề và số chương
+			const storyContent = document.createElement('div');
+
+			// Tiêu đề
+			const storyTitle = document.createElement('h4');
+			storyTitle.textContent = story.title || 'Không có tiêu đề';
+			storyTitle.style.margin = '0';
+			storyTitle.setAttribute('id_values', story.id); // Thêm thuộc tính id_values là id của truyện
+			storyTitle.addEventListener('click', async (event) => {
+				console.log("Đã click vào storyTitle!");
+
+				async function sendStoryName(element) {
+					console.log("Đã vào hàm sendStoryName!");
+
+					const storyId = event.target.getAttribute('id_values');
+					console.log("storyId:", storyId);
+
+					try {
+						// Gửi yêu cầu đến API để lấy thông tin truyện theo ID
+						const response = await fetch(`/story/${storyId}`);
+						const data = await response.json();
+						console.log("Truyện đã được click:", data);
+
+						// Lưu thông tin truyện vào localStorage
+						localStorage.setItem('data', JSON.stringify(data));
+
+						// Chuyển hướng đến trang story.html
+						window.location.href = `/story-details`;
+					} catch (error) {
+						console.error('Lỗi khi lấy dữ liệu truyện:', error);
+					}
+				}
+
+
+				sendStoryName(event.target);
+			});
+
+
+			// Thêm tiêu đề  vào phần nội dung
+			storyContent.appendChild(storyTitle);
+
+
+			// Thêm ảnh và phần nội dung vào thẻ chính
+			storyCard.appendChild(storyImage);
+			storyCard.appendChild(storyContent);
+			storyCard.style.position = 'relative';
+			storyCard.style.border = 'none';
+			if (n == 1) {
+				const storyChapters = document.createElement('p');
+				storyChapters.textContent = `Số chương: ${story.chapters || 'Không rõ'}`;
+				storyChapters.style.margin = '0';
+				storyContent.appendChild(storyChapters);
+				// Kiểm tra nếu userId của truyện khớp với loggedInUserId, thêm nút "Chỉnh sửa" và "Xóa"
+				if (userId === [[${ session.userId }]]) {
+
+					// Nút "Chỉnh sửa"
+					const editButton = document.createElement('button');
+					editButton.textContent = 'Chỉnh sửa';
+					editButton.style.backgroundColor = '#007bff'; // Màu xanh
+					editButton.style.color = '#fff';
+					editButton.style.border = 'none';
+					editButton.style.padding = '5px 10px';
+					editButton.style.borderRadius = '5px';
+					editButton.style.position = 'absolute';
+					editButton.style.right = '90px'; // Đặt vị trí cách bên phải 90px
+					editButton.style.top = '10px';
+					editButton.onclick = () => editStory(story.id); // Hàm editStory xử lý việc chỉnh sửa
+					storyCard.appendChild(editButton);
+
+					// Nút "Xóa"
+					const deleteButton = document.createElement('button');
+					deleteButton.textContent = 'Xóa';
+					deleteButton.style.backgroundColor = '#dc3545'; // Màu đỏ
+					deleteButton.style.color = '#fff';
+					deleteButton.style.border = 'none';
+					deleteButton.style.padding = '5px 10px';
+					deleteButton.style.borderRadius = '5px';
+					deleteButton.style.position = 'absolute';
+					deleteButton.style.right = '10px'; // Đặt vị trí cách bên phải 10px
+					deleteButton.style.top = '10px';
+					deleteButton.onclick = (event) => {
+						event.preventDefault();
+						console.log("Nhấn vào nút Xóa với ID:", story.id);
+						deleteStory(story.id);
+					};
+					// Hàm deleteStory xử lý việc xóa
+					console.log("Tạo nút Xóa cho truyện có ID:", story.id);
+					storyCard.appendChild(deleteButton);
+				}
+			}
+			else {
+
+
+				const storyChapters = document.createElement('p');
+				storyChapters.textContent = `Chương hiện tại: ${story.chapters || 'Không rõ'}`;
+				storyChapters.style.margin = '0';
+				storyContent.appendChild(storyChapters);
+				
+				const readMoreButton = document.createElement('button');
+				readMoreButton.textContent = 'Đọc tiếp';
+				readMoreButton.style.backgroundColor = '#28a745'; // Màu xanh
+				readMoreButton.style.color = '#fff';
+				readMoreButton.style.border = 'none';
+				readMoreButton.style.padding = '5px 10px';
+				readMoreButton.style.borderRadius = '5px';
+				readMoreButton.style.position = 'absolute';
+				readMoreButton.style.right = '10px'; // Đặt vị trí cách bên phải 10px
+				readMoreButton.style.top = '40px';
+				readMoreButton.dataset.chapterId = story.chapterId; 
+				readMoreButton.onclick = async () => {
+
+					const storyId = story.id;
+					const currentChapter = story.chapters || 1;
+					const chapterId = readMoreButton.dataset.chapterId;
+					console.log("chuong hien tai co id:", chapterId);
+					const response = await fetch(`/get-chapter/${chapterId}`);
+					const chapter = await response.json();
+					const chapterData = {
+						number: chapter.number,
+						title: chapter.title,
+						content: chapter.content,
+						id:chapter.id,
+					};
+					localStorage.setItem("story-name",story.title);
+					localStorage.setItem("story-id",story.id);
+					localStorage.setItem('selectedChapter', JSON.stringify(chapterData));
+					console.log("chapterdata:",chapterData);
+					console.log("story-name",localStorage.getItem("story-name"));									           
+					window.location.href = '/chapter';
+					
+				};
+
+				storyCard.appendChild(readMoreButton);
+
+
+				const deleteButtonFromBookshelf = document.createElement('button');
+				deleteButtonFromBookshelf.textContent = 'Xóa khỏi tủ sách';
+				deleteButtonFromBookshelf.style.backgroundColor = '#dc3545'; // Màu đỏ
+				deleteButtonFromBookshelf.style.color = '#fff';
+				deleteButtonFromBookshelf.style.border = 'none';
+
+				deleteButtonFromBookshelf.style.padding = '5px 10px';
+				deleteButtonFromBookshelf.style.borderRadius = '5px';
+
+				deleteButtonFromBookshelf.style.position = 'absolute';
+				deleteButtonFromBookshelf.style.right = '10px'; // Đặt vị trí cách bên phải 10px
+				deleteButtonFromBookshelf.style.top = '10px';
+				deleteButtonFromBookshelf.onclick = () => deleteFromBookshelf(story.id);
+				storyCard.appendChild(deleteButtonFromBookshelf);
+
+			}
+
+			return storyCard;
+		}
+
+
+
+
+
+
+
+		async function loadBookshelf() {
+			try {
+				const response = await fetch(`/bookshelf-of-user?userId=${userId}`);
+				storiesData = await response.json();
+				console.log("truyen", storiesData);
+				const bookListElement = document.querySelector('.bookshelf-list');
+				bookListElement.innerHTML = '';
+
+				// Kiểm tra nếu storiesData không rỗng
+				if (storiesData.length > 0) {
+					// Duyệt qua danh sách sách
+					storiesData.forEach((book) => {
+						const id = book.id;                 // ID của sách
+						const title = book.title;      // Tiêu đề sách
+						const chapters = book.chap; // Chương hiện tại (sử dụng 'current_chapter' từ BE)
+						const srcA = book.srcA;       // Hình ảnh bìa sách (sử dụng 'book_image' từ BE)
+						const chapterId = book.chapterId;
+						const chapterTitle = book.chapterTitle;
+						// Tạo thẻ card cho mỗi sách
+						console.log("chapters:", chapters);
+						const storyCard = createStoryCard({ id, title, chapters, srcA ,chapterId,chapterTitle}, 2);
+						bookListElement.appendChild(storyCard);
+					});
+				} else {
+					bookListElement.innerHTML = '<p>Không có truyện nào.</p>';
+				}
+			} catch (error) {
+				console.error('Lỗi khi lấy danh sách truyện:', error);
+			}
+		}
+
+
+
+
+
+		document.querySelector('.toggle-stories-btn').addEventListener('click', toggleStories);
+		document.querySelector('.toggle-bookshelf-btn').addEventListener('click', toggleBookshelf);
+
+
+
+
+
+		document.addEventListener("DOMContentLoaded", function () {
+			// Gọi API để lấy dữ liệu người dùng
+
+
+			console.log("User ID:", userId); // Kiểm tra giá trị userId
+
+			fetch(`/user-info/${userId}`)
+				.then(response => {
+					console.log("Response:", response);  // Ghi lại toàn bộ thông tin phản hồi
+					return response.json();  // Tiến hành chuyển đổi response thành JSON
+				})
+				.then(data => {
+					// Cập nhật dữ liệu vào các phần tử HTML
+					document.getElementById('tenHienThi').textContent = data.name;
+					document.getElementById('soDienThoai').textContent = data.phonenumber;
+					document.getElementById('email').textContent = data.email;
+					document.getElementById('gioiTinh').textContent = data.gioitinh === 'nam' ? 'Nam' : data.gioitinh === 'nu' ? 'Nữ' : 'Khác';
+					document.getElementById('butDanh').textContent = data.butdanh;
+					document.getElementById('namSinh').textContent = data.namsinh;
+					document.getElementById("truyencua").textContent = data.firstName + " " + data.lastName;
+					document.getElementById("tusach").textContent = data.firstName + " " + data.lastName;
+					// Đặt giá trị cho các trường nhập liệu
+					document.getElementById('firstName').value = data.firstName;
+					document.getElementById('lastName').value = data.lastName;;
+					document.getElementById('soDienThoaiInput').value = data.phonenumber;
+					document.getElementById('emailInput').value = data.email;
+					document.getElementById('gioiTinhInput').value = data.gioitinh;
+					document.getElementById('butDanhInput').value = data.butdanh;
+					document.getElementById('namSinhInput').value = data.namsinh;
+					if (data.srcA) {
+						console.log("scrA: ", data.srcA);
+						document.getElementById('avatar').style.backgroundImage = `url('${data.srcA}')`;
+
+					}
+
+					if (data.isSelf) {
+						console.log("Displaying bookshelf...");
+						document.getElementById('addStoryButton').style.display = "flex";
+						document.getElementById('edit-button').style.display = 'inline';
+						document.getElementById('bookshelf').style.display = "block";
+					}
+
+				})
+				.catch(error => console.error('Lỗi khi lấy dữ liệu:', error));
+		});
+
+
+
+
+
+		const avatar = document.getElementById('avatar');
+		const fileInput = document.getElementById('file-input');
+		const editButton = document.getElementById('edit-button');
+		const saveButton = document.getElementById('save-button');
+		const infoItems = document.querySelectorAll('.info-item');
+
+		let avatarFile = null; // Biến để lưu file ảnh
+
+		avatar.addEventListener('click', () => {
+			fileInput.click();
+		});
+
+		fileInput.addEventListener('change', (event) => {
+			const file = event.target.files[0];
+			if (file) {
+				avatarFile = file; // Lưu ảnh được chọn vào biến avatarFile
+				const reader = new FileReader();
+				reader.onload = (e) => {
+					avatar.style.backgroundImage = `url(${e.target.result})`;
+					document.getElementById('avatar-text').style.display = 'none';
+				};
+				reader.readAsDataURL(file);
+			}
+		});
+
+
+
+
+
+		editButton.addEventListener('click', function () {
+			infoItems.forEach(item => {
+				const displayText = item.querySelector('.display-text');
+				const editInput = item.querySelector('.edit-input');
+				displayText.style.display = 'none'; // Ẩn văn bản hiển thị
+				editInput.style.display = 'block'; // Hiển thị trường nhập liệu
+				if (item.id == "name") {
+					document.getElementById("tenHienThi").style.display = "none";
+					document.getElementById("tenHienThiInput").style.display = "block";
+					document.getElementById("firstName").style.display = "block";
+					document.getElementById("lastName").style.display = "block";
+				}
+
+			});
+			editButton.style.display = 'none'; // Ẩn nút chỉnh sửa
+			saveButton.style.display = 'inline'; // Hiển thị nút lưu
+		});
+
+		saveButton.addEventListener('click', function () {
+			console.log('Nút lưu đã được ấn!');
+			// Cập nhật thông tin và chuẩn bị gửi tới API
+			const updatedInfo = {};
+			console.log(infoItems);
+			infoItems.forEach(item => {
+				const editInputs = item.querySelectorAll('.edit-input');  // Tìm phần tử input (hoặc select)
+
+
+				editInputs.forEach(editInput => {  // Duyệt qua từng input
+					const itemId = editInput.id;  // Lấy id của từng input
+					updatedInfo[itemId] = editInput.value;  // Cập nhật thông tin vào object
+				});
+				if (item.id == "name") {
+					const firstName = document.getElementById("firstName").value;
+					const lastName = document.getElementById("lastName").value;
+					document.getElementById("truyencua").textContent = firstName + " " + lastName;
+					document.getElementById("tusach").textContent = firstName + " " + lastName;
+					document.getElementById("tenHienThi").style.display = "block";
+					document.getElementById("tenHienThi").textContent = firstName + " " + lastName;
+					document.getElementById("tenHienThiInput").style.display = "none";
+					document.getElementById("firstName").style.display = "none";
+					document.getElementById("lastName").style.display = "none";
+				}
+			});
+			console.log(updatedInfo);
+			// Gửi dữ liệu đến API bao gồm cả ảnh và thông tin
+			const formData = new FormData();
+
+			// Thêm ảnh vào FormData nếu có
+			if (avatarFile) {
+				formData.append('avatar', avatarFile); // 'avatar' là tên trường file trong API
+			}
+			formData.append('id', [[${ userId }]]);
+			// Thêm thông tin chỉnh sửa vào FormData
+			Object.keys(updatedInfo).forEach(key => {
+				formData.append(key, updatedInfo[key]);
+			});
+			console.log(formData);
+			// Gửi dữ liệu lên API
+			fetch('/update', {
+				method: 'POST',
+				body: formData
+			})
+				.then(response => response.json())
+				.then(data => {
+					console.log('Cập nhật thành công:', data);
+				})
+				.catch(error => {
+					console.error('Lỗi khi gửi dữ liệu:', error);
+				});
+
+			editButton.style.display = 'inline'; // Hiển thị lại nút chỉnh sửa
+			saveButton.style.display = 'none'; // Ẩn nút lưu
+		});
+	</script>
+
+	<script src="/jquery.min.js"></script>
+	<script src="/popper.min.js"></script>
+	<script src="/bootstrap.min.js"></script>
+	<script src="/app.js"></script>
+	<script src="/common.js"></script>
+
+	<div id="loadingPage" class="loading-full">
+		<div class="loading-full_icon">
+			<div class="spinner-grow"><span class="visually-hidden">Loading...</span></div>
+		</div>
+	</div>
+</body>
+
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+		@font-face {
+				    font-family: 'MyCustomFont';
+				    src: url('/font/font1.ttf') format('truetype'),
+				         url('/font/font2.ttf') format('truetype');
+				}
+        body {
+            font-family: MuCustomFont;
+			background-image: url('/images/taoanhdep_thu_phap_21173.jpeg');
+            background-color: #f2f2f2;
+			background-size: cover; /* Ảnh phủ toàn bộ màn hình */
+			background-position: center; /* Căn giữa ảnh */
+			background-repeat: no-repeat; /* Không lặp lại ảnh */
+			background-color: #f4f4f4; /* Màu nền dự phòng nếu ảnh không tải */
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			margin: 0; /* Bỏ khoảng trống xung quanh */
+        }
+
+        .container {
+            width: 25%;
+			opacity : 75%;
+            margin: 100px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			font-family: MyCustomFont;
+        }
+
+        h2 {
+            text-align: center;
+			font-family: MyCustomFont;
+
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input[type="text"], input[type="password"], input[type="email"] {
+            width: 95%;
+            padding: 7px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+			font-family: MyCustomFont;
+
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 9px;
+            background-color: #191a19;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+			font-family: MyCustomFont;
+
+        }
+		.p{
+			text-align: center;
+	        margin-top: 20px;
+		}
+        input[type="submit"]:hover {
+            background-color: #262c26;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Register</h2>
+    <form action="/register" method="post">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+
+        <div class="form-group">
+            <label for="confirm_password">Confirm Password:</label>
+            <input type="password" id="confirm_password" name="confirm_password" required>
+        </div>
+		<p><a href="/login" class="backToLogin">Have an account? Login here</a></p>
+        <input type="submit" value="Register">
+    </form>
+</div>
+
+</body>
+</html>

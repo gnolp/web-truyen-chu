@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<html lang="en">
+	<head>
+	    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+	    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+	    <link rel="preconnect" href="https://fonts.googleapis.com/">
+	    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+
+
+	    <!-- Bootstrap CSS v5.2.1 -->
+
+	    <link href="/bootstrap.min.css" rel="stylesheet">
+
+	    
+	    <link rel="stylesheet" href="/app.css">
+
+
+
+	    
+
+	    <title>Demo Truyện</title>
+	    <meta name="description"
+	        content="Đọc truyện online, truyện hay. Demo Truyện luôn tổng hợp và cập nhật các chương truyện một cách nhanh nhất.">
+	</head>
+
+	<body>
+	    <header class="header d-none d-lg-block">
+	        <!-- place navbar here -->
+	        <nav class="navbar navbar-expand-lg navbar-dark header__navbar p-md-0">
+	            <div class="container">
+	                <a class="navbar-brand" href="/">
+	                    <img src="images/logo.png" alt="Logo N13 Truyen" srcset="" class="img-fluid"
+	                        style="width: 100px;">
+	                </a>
+	                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+	                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+	                    aria-expanded="false" aria-label="Toggle navigation">
+	                    <span class="navbar-toggler-icon"></span>
+	                </button>
+	                
+
+						
+	                    
+
+						
+						
+	                 
+						
+						<li style="float:right;">
+							<span th:if="${session.user == null}">
+						    	<a href="/login" class="login-button" style="display: inline-block; padding: 10px 20px; background-color: #007BFF; color: white; text-decoration: none; border-radius: 5px; margin-left: 10px;">Đăng nhập</a>
+						    </span>
+						   	<span th:if="${session.user != null}">
+						        <a href="/account" class="welcome-button">Chào mừng, <span th:text="${session.user.firstName}"></span></a>
+						        <a href="/logout" class="logout-button" style="display: inline-block; padding: 10px 20px; background-color: #DC3545; color: white; text-decoration: none; border-radius: 5px; margin-left: 10px;">Đăng xuất</a>
+						    </span>
+							
+							
+
+							
+							
+						 </li>
+						
+	                </div>
+	            </div>
+	        </nav>
+	    </header>
+		</head>
+		
+		<p>Vui lòng đăng nhập để truy cập trang này!</p>
