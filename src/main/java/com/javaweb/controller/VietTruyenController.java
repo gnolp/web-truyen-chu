@@ -124,6 +124,7 @@ public class VietTruyenController {
 		String content = (String) mp.get("content");
 		int number = Integer.parseInt(mp.get("number").toString());
 		int book_id = Integer.parseInt(mp.get("book_id").toString());
+		System.out.println(title + " " + number + " " + book_id);
 		boolean createChapter = ChapterInformation.createChapter(book_id,title, number, content);
 		if(createChapter) {
 			BookInformation.updateChapter(book_id, "Create");

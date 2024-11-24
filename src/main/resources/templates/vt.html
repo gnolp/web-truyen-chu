@@ -574,28 +574,30 @@
 		const textarea = document.getElementById('storyInput');
 		const wordCountDisplay = document.getElementById('wordCount');
 		const book_id = localStorage.getItem("book_id");
-		const number = parseInt(localStorage.getItem("number"), 10); // Khai báo và lấy giá trị số chương từ localStorage
+		let number = parseInt(localStorage.getItem("number"), 10); // Khai báo và lấy giá trị số chương từ localStorage
 		let content;
 		let title = ''; // Khởi tạo title là một chuỗi rỗng ban đầu
-		const chapterId = localStorage.getItem("chapterId");
-
+		let chapterId = localStorage.getItem("chapterId");
+		localStorage.removeItem("chapterId");
 		console.log("book_id: ", book_id);
 		const act = localStorage.getItem("act");
+		localStorage.removeItem("act");
 		console.log("act:", act);
 		console.log("chapterId:", chapterId);
 
 		async function init() {
 			try {
-				const response = await fetch(`/chapter-edit/${chapterId}`); // Sử dụng chapterId từ localStorage
-				if (!response.ok) {
-					throw new Error(`Error: ${response.status} - ${response.statusText}`);
+				if(act =="edit"){
+					const response = await fetch(`/chapter-edit/${chapterId}`); // Sử dụng chapterId từ localStorage
+					if (!response.ok) {
+						throw new Error(`Error: ${response.status} - ${response.statusText}`);
+					}
+
+					const data = await response.json();
+					number = data.number;
+					content = data.content; // Gán giá trị content
+					title = data.title; // Gán giá trị title
 				}
-
-				const data = await response.json();
-				const number = data.number;
-				content = data.content; // Gán giá trị content
-				title = data.title; // Gán giá trị title
-
 				console.log("Number:", number);
 				console.log("Content:", content);
 				console.log("Title:", title);
@@ -664,7 +666,7 @@
 				alert("Vui lòng nhập nội dung trước khi lưu!");
 				return;
 			}
-
+			
 			const titleInput = document.getElementById("titleInput"); // Lấy phần tử titleInput từ DOM
 			const data1 = {
 				book_id: book_id,
@@ -672,7 +674,7 @@
 				number: number,
 				title: titleInput.value.trim(),
 			};
-
+			console.log(data1);
 			if (act === "edit") {
 				updateChapterAPI(titleInput.value.trim(), textarea.value.trim());
 				return;
