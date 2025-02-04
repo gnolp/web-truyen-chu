@@ -10,7 +10,7 @@ public class ConnectSQLServerExample {
             + "databaseName=webtruyen;"
             + "encrypt=false;";
     private static String USER_NAME = "long";
-    private static String PASSWORD = "123456789";
+    private static String PASSWORD = "123456";
  
     /**
      * main
