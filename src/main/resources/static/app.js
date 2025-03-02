@@ -72,7 +72,7 @@ window.enableScroll = function () {
 }
 
 window.enableScroll()
-
+// show full story-detail
 function showFullTabContent() {
     const productDetailInfo = document.querySelector('.story-detail__top--desc')
     if (productDetailInfo) {
@@ -88,7 +88,7 @@ function showFullTabContent() {
         }
     }
 }
-
+// hide story-detail
 function collapseDescription() {
     const productDetailInfoTabContent = document.querySelector('.story-detail__top--desc')
     if (productDetailInfoTabContent) {
@@ -117,7 +117,7 @@ if (storyDetailTopImage) {
     }
 }
 
-document.addEventListener('click', function (e) {
+document.addEventListener('mousemove', function (e) {
     if (e.target.classList.contains('info-more--more') || e.target.closest('.info-more--more')) {
         showFullTabContent()
     }
@@ -134,94 +134,18 @@ settingBackground.on('change', function (e) {
 })
 
 $(document).ready(function () {
-    const selectStoriesHot = $(".select-stories-hot")
-    const wrapperSkeletonStoriesHot = $(".wrapper-skeleton")
-    if (selectStoriesHot) {
-        function handleChangeListHot(category_id) {
-            fetch(route('get.list.story.hot'), {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': window.SuuTruyen.csrfToken,
-                },
-                body: JSON.stringify({
-                    category_id: category_id
-                })
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        var html = $(data.html);
-                        var list = $('.section-stories-hot__list:not(.wrapper-skeleton)', html);
-                        $('.section-stories-hot__list:not(.wrapper-skeleton)').replaceWith(list);
-                        wrapperSkeletonStoriesHot.addClass('d-none')
-                    }
-                })
-                .catch(function (error) {
-                    console.log(error);
-                    if (error.status !== 500) {
-                        let errorMessages = error.responseJSON.errors;
-                    } else {
-                        errorContent = error.responseJSON.message;
-                    }
-                })
-        }
-
-        selectStoriesHot.on('change', function (e) {
-            const categoryId = $(this).val()
-
-            $('.section-stories-hot__list').addClass('d-none')
-            wrapperSkeletonStoriesHot.removeClass('d-none')
-
-            handleChangeListHot(categoryId)
-        })
-
-        const themeMode = $(".theme_mode")
-        if (themeMode) {
-            themeMode.on('change', function (e) {
-                let valueThemeMode = $(this).is(":checked") ? 'dark' : 'light'
-
-                window.setCookie('bg_color', valueThemeMode, 1)
-                if ($(this).is(":checked")) {
-                    $("body").addClass('dark-theme')
-                } else {
-                    $("body").removeClass('dark-theme')
-                }
-                // window.location.reload()
-            })
-        }
-
-        let x = setInterval(() => {
-            const selectStoriesHot = document.querySelector('.select-stories-hot')
-            if (!selectStoriesHot) {
-                clearInterval(x)
+    const themeMode = $(".theme_mode");
+    if (themeMode.length) {
+        themeMode.on("change", function () {
+            let valueThemeMode = $(this).is(":checked") ? "dark" : "light";
+            
+            window.setCookie("bg_color", valueThemeMode, 1);
+            
+            if ($(this).is(":checked")) {
+                $("body").addClass("dark-theme");
             } else {
-                const options = selectStoriesHot.querySelectorAll('option')
-
-                let valueSelected = null
-                options.forEach((option, index) => {
-                    if (option.hasAttribute('selected')) {
-                        valueSelected = option.getAttribute('value')
-                    }
-                    option.removeAttribute('selected')
-                })
-                // console.log(valueSelected);
-
-                // $('.select-stories-hot option:selected').next().attr('selected', 'selected');
-                if (valueSelected == null) {
-                    $('.select-stories-hot option:first').next().attr('selected', 'selected');
-                } else {
-                    $(`.select-stories-hot option[value="${valueSelected}"]`).next().attr('selected', 'selected');
-                }
-
-                if ($(".select-stories-hot").val() != 'Tất cả') {
-                    handleChangeListHot($(".select-stories-hot").val())
-                } else {
-                    $('.select-stories-hot option:selected').next().attr('selected', 'selected');
-                }
+                $("body").removeClass("dark-theme");
             }
-
-        }, 50000);
-    }  
-})
+        });
+    }
+});

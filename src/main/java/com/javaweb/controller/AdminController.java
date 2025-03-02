@@ -28,10 +28,10 @@ public class AdminController {
 			
 			if(user.is_supper() == false) {
 				
-                return "index (1)";	
+                return "index2";	
 			}
 			else {
-				return "admin";
+				return "admin (2)";
 			}
 		}
 		return "loginPlease";

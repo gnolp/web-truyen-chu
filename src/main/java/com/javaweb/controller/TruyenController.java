@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.javaweb.bean.Book;
+import com.javaweb.bean.Category;
 import com.javaweb.bean.Chapter;
 import com.javaweb.repository.BookInformation;
 import com.javaweb.repository.ChapterInformation;
@@ -151,5 +152,16 @@ public class TruyenController {
 	@GetMapping("/get-chapter/{id}")
 	public Chapter getChapter(@PathVariable int id) {
 		return ChapterInformation.getChapterById(id);
+	}
+	@GetMapping("/category-of-story/{id}")
+	public ResponseEntity<List<Category>> getCategory(@PathVariable("id") int book_id) throws SQLException{
+		return ResponseEntity.ok(BookInformation.getCategory(book_id));
+	}
+	@GetMapping("/stories-new")
+	public static Map<String,Object> getTruyenNew() throws SQLException{
+		Map<String,Object> mp = new HashMap<>();
+		List<Book> books = BookInformation.getTruyenNew(10);
+		mp.put("stories", books);
+		return mp;
 	}
 }

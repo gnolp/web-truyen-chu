@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.javaweb.bean.Book;
+import com.javaweb.bean.Category;
 import com.javaweb.bean.Chapter;
 
 public class BookInformation {
@@ -425,5 +426,53 @@ public class BookInformation {
 			}
 		}
 		return list;
+	}
+	public static List<Category> getCategory(int book_id) throws SQLException{
+		List<Category> list = new ArrayList<>();
+		String sql ="SELECT c.id, c.name \r\n"
+				+ "FROM category c\r\n"
+				+ "JOIN book_category bc ON c.id = bc.category_id\r\n"
+				+ "WHERE bc.book_id = ?;";
+		try(Connection conn = ConnectionDB.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)){
+			stmt.setInt(1, book_id);
+			ResultSet rs = stmt.executeQuery();
+			while(rs.next()) {
+				Category c = new Category();
+				c.setId(rs.getInt("id"));
+				c.setName(rs.getString("name"));
+				list.add(c);
+			}
+		}
+		return list;
+	}
+	public static List<Book> getTruyenNew(int minLuotDoc) throws SQLException {
+	    List<Book> books = new ArrayList<>();
+	    String sql = "SELECT TOP 10 * " +
+	                 "FROM book " +
+	                 "WHERE luot_doc > ? " +
+	                 "ORDER BY updated_at DESC;";
+
+	    try (Connection conn = ConnectionDB.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+	        stmt.setInt(1, minLuotDoc); // Gán giá trị x vào câu lệnh SQL
+	        ResultSet rs = stmt.executeQuery();
+
+	        while (rs.next()) {
+	            Book book = new Book();
+	            book.setStatus(rs.getString("status") + ", hot");
+	            book.setAuthor_id(rs.getLong("author_id"));
+	            book.setCreated_at(rs.getDate("created_at"));
+	            book.setId(rs.getInt("id"));
+	            book.setLuotdoc(rs.getInt("luot_doc"));
+	            book.setMo_ta(rs.getString("mo_ta"));
+	            book.setSo_chuong(rs.getInt("so_chuong"));
+	            book.setTitle(rs.getString("title"));
+	            book.setSrcA(rs.getString("srcA") != null ? rs.getString("srcA") : null);
+	            book.setUpdated_at(rs.getDate("updated_at"));
+	            books.add(book);
+	        }
+	    }
+	    return books;
 	}
 }

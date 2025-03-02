@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+</head>
+<style>
+    .c-tabs .nav-link.active {
+        background-color: #182433 !important; /* Màu nền khi active */
+        color: #DCE1E7 !important; /* Màu chữ khi active */
+        border-color: #1B293A !important; /* Màu viền khi active */
+    }
+    
+    .b-form{
+        color:whitesmoke;
+    }
+    .tab-pane {
+        transition: opacity 0.3s ease-in-out; /* Làm mờ dần khi chuyển tab */
+    }
+    .table-search-input {
+        width: 100%;
+    }
+    input::placeholder {
+        color: rgb(228, 217, 217) !important; /* Đổi màu chữ thành đỏ */
+        opacity: 1; /* Đảm bảo không bị mờ */
+    }
+    
+    thead th{
+        text-align: center;
+        background-color: #182433 !important; 
+        color: white !important;
+    }
+    tbody td{
+        text-align: center;
+        background-color: #182433 !important; 
+        color: rgba(255, 255, 255, 0.753) !important;
+    }
+    @media (max-width: 992px) {
+        .row {
+            row-gap: .25em;
+        }
+    }
+    span.icon-tabler-wrapper:has(svg) {
+        align-items: center;
+        display: inline-flex;
+        justify-content: center;
+        line-height: 0;
+        vertical-align: middle
+    }
+    
+    .icon-tabler-wrapper.icon-lg svg {
+        --bb-icon-size: 3.5rem;
+        stroke-width: 1
+    }
+    
+    .icon-tabler-wrapper.icon-sm svg {
+        --bb-icon-size: 1rem;
+        stroke-width: 1
+    }
+    
+    .icon-tabler-wrapper.icon-md svg {
+        --bb-icon-size: 2.5rem;
+        stroke-width: 1
+    }
+    
+    .icon-tabler-wrapper.input-icon-addon {
+        z-index: 10
+    }
+    .dashboard-widget-item .visual .icon {
+        --bb-icon-size: 80px
+    }
+    
+    .dashboard-widget-item .details {
+        height: 9rem
+    }
+    
+    .dashboard-widget-item .details .number {
+        font-size: 52px;
+        line-height: 78px
+    }
+    
+    .dashboard-widget-item .details .desc {
+        font-size: 14px;
+        letter-spacing: 0
+    }
+    
+    .page {
+        min-height: 100vh;
+    }
+    .sidebar {
+        width: 250px;
+        background-color: #182433;
+        color: white;
+        min-height: 100vh;
+    }
+    .sidebar a {
+        color: white;
+        padding: 10px;
+        display: block;
+        text-decoration: none;
+        opacity: 70%;
+    }
+    .sidebar a:hover {
+        background-color: #1f2e3f;
+    }
+    .tab-pane {
+        height: 100%;
+        width: 100%;
+    }
+</style>
+<body>
+    <div class="flex-grow-1">
+        <!-- HEADER -->
+        <header class="navbar navbar-expand-lg navbar-dark" style="background-color: #182433;">
+            <div class="container-fluid">
+                <!-- Nút toggler chỉ hiện khi màn nhỏ -->
+                <button class="navbar-toggler ms-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <a class="navbar-brand ms-5" href="#">
+                    <img src="/images/gnolp.png" style="width: 60px;">
+                </a>
+                <div class="dropdown nav-item d-flex">
+                    <a class="p-0 narbar-link d-flex ms-4 lh-1 text-reset" data-bs-toggle="dropdown" aria-label="Open admin menu" aria-expanded="false">
+                        <button class="btn btn-outline-primary text-decoration-none" style="width: 40px; height:40px; color:aliceblue;">A</button>    
+                    </a>
+                    <div class="d-none d-lg-flex flex-column ps-2  text-decoration-none pe-lg-2" style="color:#99a8b8">
+                        <div>Admin</div>
+                        <div class="small">admin@zent.vn</div>
+                    </div>
+                </a>
+                <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-end"data-bs-popper="static" style="background-color: #182433;">
+                    <a class="dropdown-item" href="#" style="color:#99a8b8">
+                        <span class="icon-tabler-wrapper dropdown-item-icon"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path></svg> Profile </span>
+                    </a>
+                    <a class="dropdown-item" href="#" style="color:#99a8b8">
+                        <span class="icon-tabler-wrapper dropdown-item-icon"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-logout" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"></path><path d="M9 12h12l-3 -3"></path><path d="M18 15l3 -3"></path></svg> Logout </span>
+                    </a>
+                </div> 
+            </div>
+        </header>
+        <aside class="offcanvas offcanvas-start d-lg-none sidebar" id="sidebarMenu" style="position:fixed !important">
+            <div class="offcanvas-body">
+                <ul class="nav flex-column p-3 nav-tabs T">
+                    <li class="nav-item">
+                        <a class="nav-link active d-flex gap-2 " data-bs-toggle="tab" href="#Dashboard">
+                            <span class="">
+                                <span class="icon-tabler-wrapper">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                        <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
+                                        <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
+                                        <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
+                                    </svg>
+                                </span>
+                            </span>
+                            <span class="mt-1"> Dashboard </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex gap-2" data-bs-toggle="tab" href="#Story">
+                            <span class="">
+                                <span class="icon-tabler-wrapper">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-notebook" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                        <path d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-11a1 1 0 0 1 -1 -1v-14a1 1 0 0 1 1 -1m3 0v18"></path>
+                                        <path d="M13 8l2 0"></path>
+                                        <path d="M13 12l2 0"></path>
+                                    </svg>
+                                </span>
+                            </span>
+                            <span>  Story </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex gap-2" data-bs-toggle="tab" href="#User">
+                            <span class="">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-users" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"></path>
+                                    <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"></path>
+                                  </svg>
+                            </span>
+                            <span> User</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex gap-2" data-bs-toggle="tab" href="#Admin">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <span class="icon-tabler-wrapper mt-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user-shield" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                        <path d="M6 21v-2a4 4 0 0 1 4 -4h2"></path>
+                                        <path d="M22 16c0 4 -2.5 6 -3.5 6s-3.5 -2 -3.5 -6c1 0 2.5 -.5 3.5 -1.5c1 1 2.5 1.5 3.5 1.5z"></path>
+                                        <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
+                                      </svg>
+                                </span>
+                            </span>
+                            <span class="mt-1">Admin Profile</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+    <div class="page d-flex">
+        <aside class="sidebar d-none d-lg-block">
+            <ul class="nav flex-column p-3 nav-tabs T">
+                <li class="nav-item">
+                    <a class="nav-link active d-flex gap-2" data-bs-toggle="tab" href="#Dashboard">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <span class="icon-tabler-wrapper">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
+                                    <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
+                                    <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
+                                </svg>
+                            </span>
+                        </span>
+                        <span class="mt-1"> Dashboard </span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link d-flex gap-2" data-bs-toggle="tab" href="#Story">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <span class="icon-tabler-wrapper">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-notebook" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-11a1 1 0 0 1 -1 -1v-14a1 1 0 0 1 1 -1m3 0v18"></path>
+                                    <path d="M13 8l2 0"></path>
+                                    <path d="M13 12l2 0"></path>
+                                </svg>
+                            </span>
+                        </span>
+                        <span>  Story </span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link d-flex gap-2" data-bs-toggle="tab" href="#User">
+                        <span class="">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-users" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"></path>
+                                <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"></path>
+                              </svg>
+                        </span>
+                        <span> User</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link d-flex gap-2" data-bs-toggle="tab" href="#Admin">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <span class="icon-tabler-wrapper mt-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user-shield" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M6 21v-2a4 4 0 0 1 4 -4h2"></path>
+                                    <path d="M22 16c0 4 -2.5 6 -3.5 6s-3.5 -2 -3.5 -6c1 0 2.5 -.5 3.5 -1.5c1 1 2.5 1.5 3.5 1.5z"></path>
+                                    <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
+                                  </svg>
+                            </span>
+                        </span>
+                        <span class="mt-1">Admin Profile</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+        <div class="tab-content container-fluid" style="padding-right:0px !important;padding-left:0px !important;background-color:#151F2C">
+            <div class="tab-pane show active"  id="Dashboard" role="tabpanel">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12 mt-5">
+                            <div class="row">
+                                <div class="col-12 dashboard-widget-item col-md-6 col-lg-3">
+                                    <a class="text-white d-block rounded position-relative overflow-hidden text-decoration-none" href="#" style="background-color: #8bcd49;">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="details px-4 py-3 d-flex flex-column justify-content-between">
+                                                <div class="desc fw-medium">Views of the day</div>
+                                                <div class="number fw-bolder">
+                                                    <span data-counter="counterup" data-value="12">12</span>
+                                                </div>
+                                            </div>
+                                            <div class="visual ps-1 position-absolute end-0">
+                                                <span class="icon-tabler-wrapper me-n2" style="opacity: 0.1; --bb-icon-size: 80px;">
+                                                    <svg width="100" height="100" viewBox="0 0 511.999 511.999" xmlns="http://www.w3.org/2000/svg">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                        <g><g><path d="M508.745,246.041c-4.574-6.257-113.557-153.206-252.748-153.206S7.818,239.784,3.249,246.035 c-4.332,5.936-4.332,13.987,0,19.923c4.569,6.257,113.557,153.206,252.748,153.206s248.174-146.95,252.748-153.201 C513.083,260.028,513.083,251.971,508.745,246.041z M255.997,385.406c-102.529,0-191.33-97.533-217.617-129.418 c26.253-31.913,114.868-129.395,217.617-129.395c102.524,0,191.319,97.516,217.617,129.418 C447.361,287.923,358.746,385.406,255.997,385.406z"/></g></g>
+                                                        <g><g><path d="M255.997,154.725c-55.842,0-101.275,45.433-101.275,101.275s45.433,101.275,101.275,101.275 s101.275-45.433,101.275-101.275S311.839,154.725,255.997,154.725z M255.997,323.516c-37.23,0-67.516-30.287-67.516-67.516 s30.287-67.516,67.516-67.516s67.516,30.287,67.516,67.516S293.227,323.516,255.997,323.516z"/></g></g>
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col dashboard-widget-item col-12 col-md-6 col-lg-3">
+                                    <a class="text-white d-block rounded position-relative overflow-hidden text-decoration-none" href="#" style="background-color: #c85a5a;">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="details px-4 py-3 d-flex flex-column justify-content-between">
+                                                <div class="desc fw-medium">New Books</div>
+                                                <div class="number fw-bolder">
+                                                    <span data-counter="counterup" data-value="12">12</span>
+                                                </div>
+                                            </div>
+                                            <div class="visual ps-1 position-absolute end-0">
+                                                <span class="icon-tabler-wrapper me-n2" style="opacity: 0.1; --bb-icon-size: 80px;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-files" width="100" height="100" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                        <path d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-11a1 1 0 0 1 -1 -1v-14a1 1 0 0 1 1 -1m3 0v18"></path>
+                                                        <path d="M13 8l2 0"></path>
+                                                        <path d="M13 12l2 0"></path>
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-12 dashboard-widget-item col-md-6 col-lg-3">
+                                    <a class="text-white d-block rounded position-relative overflow-hidden text-decoration-none" href="#" style="background-color: #4993cdeb;">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="details px-4 py-3 d-flex flex-column justify-content-between">
+                                                <div class="desc fw-medium">User</div>
+                                                <div class="number fw-bolder">
+                                                    <span data-counter="counterup" data-value="24">24</span>
+                                                </div>
+                                            </div>
+                                            <div class="visual ps-1 position-absolute end-0">
+                                                <span class="icon-tabler-wrapper me-n2" style="opacity: 0.1; --bb-icon-size: 80px;">
+                                                    <svg width="100" height="100" viewBox="0 0 511.999 511.999" xmlns="http://www.w3.org/2000/svg">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                        <g><path d="M110.534,220.962c0-49.027,39.741-88.768,88.768-88.768s88.768,39.741,88.768,88.768c0,49.026-39.741,88.768-88.768,88.768 S110.534,269.989,110.534,220.962z M236.968,315.783h-75.327c-62.668,0-113.655,50.986-113.655,113.646v92.143l0.236,1.437 l6.36,1.985c59.796,18.679,111.764,24.914,154.531,24.914c83.531,0,131.94-23.82,134.938-25.333l5.94-3.015l0.626,0.006v-92.137 C350.617,366.769,299.631,315.783,236.968,315.783z M350.617,177.533c49.024,0,88.768-39.741,88.768-88.768 C439.385,39.741,399.642,0,350.617,0c-49.023,0-88.768,39.741-88.768,88.765C261.85,137.792,301.594,177.533,350.617,177.533z M388.28,183.585h-75.326c-1.797,0-3.547,0.189-5.32,0.275c6.81,14.295,10.74,30.225,10.74,47.094 c0,31.129-13.057,59.205-33.922,79.23c48.823,14.523,86.144,55.986,94.638,107.08c71.999-3.145,113.504-23.49,116.265-24.885 l5.94-3.015l0.626,0.012v-92.137C501.933,234.575,450.946,183.585,388.28,183.585z" fill="#000000" style="fill: rgb(233, 215, 215);"></path></g>
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-12 dashboard-widget-item col-md-6 col-lg-3">
+                                    <a class="text-white d-block rounded position-relative overflow-hidden text-decoration-none" href="#" style="background-color: #cd49a7;">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="details px-4 py-3 d-flex flex-column justify-content-between">
+                                                <div class="desc fw-medium">New Report</div>
+                                                <div class="number fw-bolder">
+                                                    <span data-counter="counterup" data-value="1">1</span>
+                                                </div>
+                                            </div>
+                                            <div class="visual ps-1 position-absolute end-0">
+                                                <span class="icon-tabler-wrapper me-n2" style="opacity: 0.1; --bb-icon-size: 80px;">
+                                                    <svg width="100" height="100" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                        <path d="m9 6v41h-3a1 1 0 0 0 -1 1v1a5.009 5.009 0 0 0 4 4.9v7.1a1 1 0 0 0 1 1h44a1 1 0 0 0 1-1v-55a1 1 0 0 0 -1-1h-17.432a4.978 4.978 0 0 0 -9.136 0h-17.432a1 1 0 0 0 -1 1zm-2 43h34a4.948 4.948 0 0 0 1.026 3h-32.026a3 3 0 0 1 -3-3zm35-42h11v53h-42v-6h35a5.006 5.006 0 0 0 5-5v-39a1 1 0 0 0 -1-1h-8zm-18 0h4.142a1 1 0 0 0 .967-.749 2.982 2.982 0 0 1 5.782 0 1 1 0 0 0 .967.749h4.142v4h-16zm0 6h16a2 2 0 0 0 2-2h7v38a3 3 0 0 1 -6 0v-1a1 1 0 0 0 -1-1h-27v-36h7a2 2 0 0 0 2 2zm-13-6h11v2h-8a1 1 0 0 0 -1 1v37h-2z" fill="#000000" style="fill: rgb(223, 200, 200);"></path><path d="m18 15a1 1 0 0 0 -1 1v4a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-4a1 1 0 0 0 -1-1zm3 4h-2v-2h2z" fill="#000000" style="fill: rgb(223, 200, 200);"></path><path d="m22 23h-4a1 1 0 0 0 -1 1v4a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-4a1 1 0 0 0 -1-1zm-1 4h-2v-2h2z" fill="#000000" style="fill: rgb(223, 200, 200);"></path><path d="m22 31h-4a1 1 0 0 0 -1 1v4a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-4a1 1 0 0 0 -1-1zm-1 4h-2v-2h2z" fill="#000000" style="fill: rgb(223, 200, 200);"></path><path d="m22 39h-4a1 1 0 0 0 -1 1v4a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-4a1 1 0 0 0 -1-1zm-1 4h-2v-2h2z" fill="#000000" style="fill: rgb(223, 200, 200);"></path><path d="m25 15h17v2h-17z" fill="#000000" style="fill: rgb(223, 200, 200);"></path><path d="m29 19h17v2h-17z" fill="#000000" style="fill: rgb(223, 200, 200);"></path><path d="m25 23h17v2h-17z" fill="#000000" style="fill: rgb(223, 200, 200);"></path><path d="m29 27h17v2h-17z" fill="#000000" style="fill: rgb(223, 200, 200);"></path><path d="m25 31h17v2h-17z" fill="#000000" style="fill: rgb(223, 200, 200);"></path><path d="m29 35h17v2h-17z" fill="#000000" style="fill: rgb(223, 200, 200);"></path><path d="m25 39h17v2h-17z" fill="#000000" style="fill: rgb(223, 200, 200);"></path><path d="m29 43h17v2h-17z" fill="#000000" style="fill: rgb(223, 200, 200);"></path><path d="m25 19h2v2h-2z" fill="#000000" style="fill: rgb(223, 200, 200);"></path><path d="m25 27h2v2h-2z" fill="#000000" style="fill: rgb(223, 200, 200);"></path><path d="m25 35h2v2h-2z" fill="#000000" style="fill: rgb(223, 200, 200);"></path><path d="m25 43h2v2h-2z" fill="#000000" style="fill: rgb(223, 200, 200);"></path></svg>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12 mt-5">
+                            <span class="d-block fw-bold mb-1" style="color:aliceblue">Top 3 author of week</span>
+                            
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:20px;text-align: center !important">Id</th>
+                                            <th class="w-1 text-start" style="width: 100px;text-align: center !important;">Avatar</th>
+                                            <th class="text-start" style="width: 250px;text-align: center !important;">Name</th>
+                                            <th style="width: 250px;text-align: center !important;">Pseudonym</th>
+                                            <th style="width: 250px;text-align: center !important;">Created At</th>
+                                            <th style="text-align: center !important;">Story</th>
+                                            <th style="text-align: center !important;">Chapter</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                1
+                                            </td>
+                                            <td>
+                                                <img src="/images/captain america brave new world.jpg" style="width: 65px;">
+                                            </td>
+                                            <td>
+                                                Phạm Ngọc Long
+                                            </td>
+                                            <td>
+                                                gnolp
+                                            </td>
+                                            <td>
+                                                25/1/2025
+                                            </td>
+                                            <td>
+                                                2
+                                            </td>
+                                            <td>
+                                                1022
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade"  id="Story" role="tabpanel">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12 mt-4">
+                            <div class="d-flex align-items-center p-2" style="box-shadow: 0 0 0 1px #1B293A;">
+                                <div class="d-flex">
+                                    <button class="btn me-3 d-flex" style="color:#DCE1E7;  text-align: center;margin-left: 2rem;box-shadow: 0 0 0 1px #1B293A;">Delete</button>
+                                    <div class="table-search-input">
+                                        <label>
+                                            <div class="input-group">
+                                                <input type="search" placeholder="Title..." class="form-control" style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
+                                            </div> 
+                                        </label>
+                                    </div>
+                                    <div class="table-search-input">
+                                        <label>
+                                            <div class="input-group">
+                                                <input type="search" placeholder="Authors..." class="form-control" style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
+                                                    <span class="input-group-text" style="background-color:#151F2C; color:#DCE1E7; border:none !important">
+                                                        <i class="bi bi-search"></i>
+                                                    </span>
+                                            </div> 
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="ms-auto">
+                                    <button class="btn btn-info">Refresh  
+                                    </button>
+                                    <button class="ms-2 btn .bg-transparent">
+                                        <span>
+                                            <svg width="25px" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 512 512"><g><g><g><path d="m476.2,239.8c-0.4,0-0.8,0-1.2,0-10.7,0.3-19.5,8.9-19.8,19.8-2.9,92.9-67.6,172-157.4,192.5-77.4,17.6-156.7-12.2-204.1-73.7l59.1,12.4c11,2.3 21.9-4.8 24.2-15.8 2.3-11-4.7-21.9-15.8-24.2l-103.9-21.8c-16.5-2.5-23.6,10.3-24.2,15.9l-21.6,104.6c-2.3,11 4.8,21.8 15.9,24.1 11,2.3 21.8-4.8 24.1-15.9l11-53.1c57.2,73 151.9,108.3 244.5,87.2 107.9-24.6 185.6-119.6 189.1-231 0.2-11.2-8.6-20.6-19.9-21z" fill="#000000" style="fill: rgb(219, 204, 204);"></path><path d="m485.3,41.4c-11-2.6-22,4.2-24.5,15.2l-12.4,52.8c-55.2-74.5-148.9-112.3-242-93.7-108.6,21.7-188.9,114.6-195.3,225.9-0.7,11.3 7.9,20.9 19.2,21.6 0.4,0 0.8,0 1.2,0 10.7,0 19.7-8.4 20.4-19.2 5.3-92.8 72.1-170.2 162.4-188.2 77.9-15.6 156.3,16.4 202.1,79.2l-58.7-14c-11-2.6-22,4.2-24.6,15.1-2.6,11 4.2,22 15.1,24.6l103.3,24.6c16.4,3 23.9-9.7 24.6-15.2l24.4-104.1c2.6-11-4.2-22-15.2-24.6z" fill="#000000" style="fill: rgb(219, 204, 204);"></path></g></g></g></svg>
+                                        </span>
+                                    </button>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <div class="col-12 mt-5">
+                            <div class="table-responsive">
+                                <div style="max-height: 500px; overflow: auto; border: 1px solid black;">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <div> 
+                                                        <input type="checkbox">
+                                                    </div>
+                                                </th>
+                                                <th style="width:20px;text-align: center !important">Id</th>
+                                                <th class="w-1 text-start" style="width: 100px;text-align: center !important;">Image</th>
+                                                <th class="text-start" style="width: 250px;text-align: center !important;">Title</th>
+                                                <th clas="">Author</th>
+                                                <th style="width: 250px;text-align: center !important;">Status</th>
+                                                <th style="width: 250px;text-align: center !important;">Created At</th>
+                                                <th style="text-align: center !important;">Views</th>
+                                                <th style="text-align: center !important;">Chapter</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox">
+                                                </td>
+                                                <td>    
+                                                    1
+                                                </td>
+                                                <td>
+                                                    <img src="/images/captain america brave new world.jpg" style="width: 65px;">
+                                                </td>
+                                                <td>
+                                                    Phạm Ngọc Long
+                                                </td>
+                                                <td>
+                                                    gnolp
+                                                </td>
+                                                <td>
+                                                    Còn tiếp
+                                                </td>
+                                                <td>
+                                                    25/1/2025
+                                                </td>
+                                                <td>
+                                                    1000
+                                                </td>
+                                                <td>
+                                                    2
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox">
+                                                </td>
+                                                <td>    
+                                                    1
+                                                </td>
+                                                <td>
+                                                    <img src="/images/captain america brave new world.jpg" style="width: 65px;">
+                                                </td>
+                                                <td>
+                                                    Phạm Ngọc Long
+                                                </td>
+                                                <td>
+                                                    gnolp
+                                                </td>
+                                                <td>
+                                                    Còn tiếp
+                                                </td>
+                                                <td>
+                                                    25/1/2025
+                                                </td>
+                                                <td>
+                                                    1000
+                                                </td>
+                                                <td>
+                                                    2
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox">
+                                                </td>
+                                                <td>    
+                                                    1
+                                                </td>
+                                                <td>
+                                                    <img src="/images/captain america brave new world.jpg" style="width: 65px;">
+                                                </td>
+                                                <td>
+                                                    Phạm Ngọc Long
+                                                </td>
+                                                <td>
+                                                    gnolp
+                                                </td>
+                                                <td>
+                                                    Còn tiếp
+                                                </td>
+                                                <td>
+                                                    25/1/2025
+                                                </td>
+                                                <td>
+                                                    1000
+                                                </td>
+                                                <td>
+                                                    2
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade"  id="User" role="tabpanel">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12 mt-4">
+                            <div class="d-flex align-items-center p-2" style="box-shadow: 0 0 0 1px #1B293A;">
+                                <div class="d-flex">
+                                    <button class="btn me-3 d-flex" style="color:#DCE1E7;  text-align: center;margin-left: 2rem;box-shadow: 0 0 0 1px #1B293A;">Delete</button>
+                                    <div class="table-search-input">
+                                        <label>
+                                            <div class="input-group">
+                                                <input type="search" placeholder="Name..." class="form-control" style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
+                                            </div> 
+                                        </label>
+                                    </div>
+                                    <div class="table-search-input">
+                                        <label>
+                                            <div class="input-group">
+                                                <input type="search" placeholder="Email..." class="form-control" style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
+                                                    <span class="input-group-text" style="background-color:#151F2C; color:#DCE1E7; border:none !important">
+                                                        <i class="bi bi-search"></i>
+                                                    </span>
+                                            </div> 
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="ms-auto">
+                                    <button class="btn btn-info">Refresh  
+                                    </button>
+                                    <button class="ms-2 btn .bg-transparent">
+                                        <span>
+                                            <svg width="25px" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 512 512"><g><g><g><path d="m476.2,239.8c-0.4,0-0.8,0-1.2,0-10.7,0.3-19.5,8.9-19.8,19.8-2.9,92.9-67.6,172-157.4,192.5-77.4,17.6-156.7-12.2-204.1-73.7l59.1,12.4c11,2.3 21.9-4.8 24.2-15.8 2.3-11-4.7-21.9-15.8-24.2l-103.9-21.8c-16.5-2.5-23.6,10.3-24.2,15.9l-21.6,104.6c-2.3,11 4.8,21.8 15.9,24.1 11,2.3 21.8-4.8 24.1-15.9l11-53.1c57.2,73 151.9,108.3 244.5,87.2 107.9-24.6 185.6-119.6 189.1-231 0.2-11.2-8.6-20.6-19.9-21z" fill="#000000" style="fill: rgb(219, 204, 204);"></path><path d="m485.3,41.4c-11-2.6-22,4.2-24.5,15.2l-12.4,52.8c-55.2-74.5-148.9-112.3-242-93.7-108.6,21.7-188.9,114.6-195.3,225.9-0.7,11.3 7.9,20.9 19.2,21.6 0.4,0 0.8,0 1.2,0 10.7,0 19.7-8.4 20.4-19.2 5.3-92.8 72.1-170.2 162.4-188.2 77.9-15.6 156.3,16.4 202.1,79.2l-58.7-14c-11-2.6-22,4.2-24.6,15.1-2.6,11 4.2,22 15.1,24.6l103.3,24.6c16.4,3 23.9-9.7 24.6-15.2l24.4-104.1c2.6-11-4.2-22-15.2-24.6z" fill="#000000" style="fill: rgb(219, 204, 204);"></path></g></g></g></svg>
+                                        </span>
+                                    </button>
+                                    
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <div class="col-12 mt-5">
+                            <div class="table-responsive">
+                                <div style="max-height: 500px; overflow: auto; border: 1px solid black;">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <div> 
+                                                        <input type="checkbox">
+                                                    </div>
+                                                </th>
+                                                <th style="width:20px;text-align: center !important">Id</th>
+                                                <th class="w-1 text-start" style="width: 100px;text-align: center !important;">Avatar</th>
+                                                <th class="text-start" style="width: 250px;text-align: center !important;">Name</th>
+                                                <th clas="">Pseudonym</th>
+                                                <th style="width: 250px;text-align: center !important;">Phone Number</th>
+                                                <th style="width: 250px;text-align: center !important;">Email</th>
+                                                <th style="text-align: center !important;">Create At</th>
+                                                <th style="text-align: center !important;">Story</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox">
+                                                </td>
+                                                <td>    
+                                                    1
+                                                </td>
+                                                <td>
+                                                    <img src="/images/captain america brave new world.jpg" style="width: 65px;">
+                                                </td>
+                                                <td>
+                                                    Phạm Ngọc Long
+                                                </td>
+                                                <td>
+                                                    gnolp
+                                                </td>
+                                                <td>
+                                                    Null
+                                                </td>
+                                                <td>
+                                                    gnolp2513@gmail.com
+                                                </td>
+                                                <td>
+                                                    25-1-2025
+                                                </td>
+                                                <td>
+                                                    2
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox">
+                                                </td>
+                                                <td>    
+                                                    1
+                                                </td>
+                                                <td>
+                                                    <img src="/images/captain america brave new world.jpg" style="width: 65px;">
+                                                </td>
+                                                <td>
+                                                    Phạm Ngọc Long
+                                                </td>
+                                                <td>
+                                                    gnolp
+                                                </td>
+                                                <td>
+                                                    Còn tiếp
+                                                </td>
+                                                <td>
+                                                    25/1/2025
+                                                </td>
+                                                <td>
+                                                    1000
+                                                </td>
+                                                <td>
+                                                    2
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox">
+                                                </td>
+                                                <td>    
+                                                    1
+                                                </td>
+                                                <td>
+                                                    <img src="/images/captain america brave new world.jpg" style="width: 65px;">
+                                                </td>
+                                                <td>
+                                                    Phạm Ngọc Long
+                                                </td>
+                                                <td>
+                                                    gnolp
+                                                </td>
+                                                <td>
+                                                    Còn tiếp
+                                                </td>
+                                                <td>
+                                                    25/1/2025
+                                                </td>
+                                                <td>
+                                                    1000
+                                                </td>
+                                                <td>
+                                                    2
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade"  id="Admin" role="tabpanel">
+                <div class="container-fluid mt-5">
+                    <ul class="nav c-tabs nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">User profile</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="avatar-tab" data-bs-toggle="tab" data-bs-target="#avatar" type="button" role="tab">Avatar</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#password" type="button" role="tab">Change password</button>
+                        </li>
+                        
+                    </ul>
+                    <div class="tab-content p-4  rounded-bottom" id="myTabContent" style="background-color: #182433;">
+                        <div class="tab-pane fade active show" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                            <form>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label b-form">First Name *</label>
+                                        <input type="text" class="form-control" value="Admin" style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label b-form">Last Name *</label>
+                                        <input type="text" class="form-control" value="PTIT" style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label b-form">Username *</label>
+                                        <input type="text" class="form-control" value="admin" style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label b-form">Email *</label>
+                                        <input type="email" class="form-control" value="admin@zent.vn" style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </form>
+                        </div>
+                        <div class="tab-pane fade" id="avatar" role="tabpanel" aria-labelledby="avatar-tab">
+                                <div class="mb-3 text-center">
+                                    <img id="avatar-preview" src="/images/NỤ HÔN BẠC TỶ.jpg" class="rounded-circle" width="150" height="150">
+                                </div>
+                                <div class="mb-3 text-center">
+                                    <input type="file" id="avatar-input" class="form-control" accept="image/*">
+                                </div>
+                        </div>
+                        <div class="tab-pane fade" id="password" role="tabpanel" aria-labelledby="password-tab">
+                            <div class="form-group">
+                                <label for="currentPassword" class="b-form">Current Password <span class="text-danger">*</span></label>
+                                <input type="password" id="currentPassword" class="form-control" required style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
+                            </div>
+                            <div class="form-group">    
+                                <label for="newPassword" class="b-form">New Password <span class="text-danger">*</span></label>
+                                <input type="password" id="newPassword" class="form-control" required style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="confirmPassword" class="b-form" >Confirm New Password <span class="text-danger">*</span></label>
+                                <input type="password" id="confirmPassword" class="form-control" required style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
+                                <small class="text-danger d-none" id="passwordError">Passwords do not match!</small>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById("confirmPassword").addEventListener("input", function () {
+            let newPassword = document.getElementById("newPassword").value;
+            let confirmPassword = this.value;
+            let errorText = document.getElementById("passwordError");
+        
+            if (newPassword !== confirmPassword) {
+                this.classList.add("is-invalid");
+                errorText.classList.remove("d-none");
+            } else {
+                this.classList.remove("is-invalid");
+                errorText.classList.add("d-none");
+            }
+        });
+        document.getElementById("avatar-input").addEventListener("change", function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById("avatar-preview").src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        document.querySelectorAll('.nav-tabs.T .nav-link[data-bs-toggle="tab"]').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                let link = tab.getAttribute("href");
+                console.log('link',link);
+                document.querySelectorAll('.nav-tabs .nav-link[data-bs-toggle="tab"]').forEach(a => {
+                    a.classList.remove('active');
+                });
+                document.querySelectorAll(`[href="${link}"]`).forEach(a => {
+                    a.classList.add('active');
+                });
+        
+                document.querySelectorAll('.tab-pane').forEach(pane => {
+                    pane.classList.remove("show", "active");
+                });
+                let targetPane = document.querySelector(link);
+                if (targetPane) {
+                    targetPane.classList.add("show", "active");
+                }
+            });
+        });
+        document.getElementById('sidebarMenu').addEventListener('shown.bs.offcanvas', () => {
+            let activeTab = document.querySelector('.nav-tabs .nav-link.active');
+            if (activeTab) {
+                let link = activeTab.getAttribute("href");
+                    document.querySelectorAll(`[href="${link}"]`).forEach(a => {
+                    a.classList.add('active');
+                });
+        
+                let targetPane = document.getElementById(link);
+                if (targetPane) {
+                    targetPane.classList.add("show", "active");
+                }
+            }
+        });
+    </script>
+</body>
+</html>

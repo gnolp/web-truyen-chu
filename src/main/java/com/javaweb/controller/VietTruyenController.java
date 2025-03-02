@@ -43,7 +43,7 @@ public class VietTruyenController {
 	}
 	@GetMapping("/story-details")
 	public static String getTruyen(){
-		return "tmp";
+		return "story-details";
 	}
 	
 	@GetMapping("/them-truyen")

@@ -42,6 +42,6 @@ public class LoginController {
 	}
 	@GetMapping("")
 	public String getHome() {
-		return "index (1)";
+		return "index2";
 	}
 }
