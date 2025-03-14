@@ -121,17 +121,20 @@ public class AccountController {
 
             	    // Cập nhật đường dẫn ảnh (nếu có)
             	    if (path != null) {
-            	        a.setScrA(path.toString().substring(33)); // Nếu cần lấy phần đường dẫn sau thư mục gốc
+            	        a.setScrA(path.toString().substring(33));
             	    }
 
             	    // Cập nhật thông tin người dùng
             	    if (UserInformation.updateUserInformation(a)) {
+            	    	System.out.println("ok");
             	        return ResponseEntity.ok("Cập nhật thành công");
             	    } else {
+            	    	System.out.println("sai ở đây");
             	        return ResponseEntity.status(500).body("Cập nhật thất bại");
             	    }
             	} catch (IOException e) {
             	    // Log lỗi chi tiết
+            		System.out.println("sai ở đây2");
             	    e.printStackTrace();
             	    return ResponseEntity.status(500).body("Lỗi khi lưu ảnh");
             	}
@@ -147,6 +150,7 @@ public class AccountController {
         	if(up) return ResponseEntity.ok("done");
         	else return ResponseEntity.status(500).body("false");
         }
+        
 }
              
 

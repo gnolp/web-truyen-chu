@@ -12,6 +12,13 @@ public class User {
 	private String gioitinh;
 	private String phonenumber;
 	private String scrA;
+	private String created_at;
+	public String getCreated_at() {
+		return created_at;
+	}
+	public void setCreated_at(String created_at) {
+		this.created_at = created_at;
+	}
 	private boolean is_supper;
 	public int getNamsinh() {
 		return namsinh;

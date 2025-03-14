@@ -40,7 +40,6 @@ public class ChangeInf {
 			            return ResponseEntity.notFound().build();
 			        }
 
-			        // Chuẩn bị dữ liệu trả về
 			        Map<String, Object> response = new HashMap<>();
 			        response.put("name", user.getFirstName()+" "+user.getLastName());
 			        response.put("email", user.getEmail());

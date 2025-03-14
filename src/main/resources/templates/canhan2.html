@@ -347,7 +347,7 @@
 		<nav class="navbar navbar-expand-lg navbar-dark header__navbar p-md-0">
 			<div class="container">
 				<a class="navbar-brand" href="/">
-					<img src="images/logo.png" alt="Logo N13 Truyen" srcset="" class="img-fluid" style="width: 100px;">
+					<img src="/images/gnolp.png" alt="Logo Truyen" srcset="" class="img-fluid" style="width: 100px;">
 				</a>
 				<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
 					data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
@@ -544,7 +544,7 @@
 		<nav class="navbar navbar-dark bg-dark">
 			<div class="container-fluid">
 				<a class="navbar-brand" href="index.html">
-					<img src="/images/logo.png" alt="Logo Truyen" srcset="" class="img-fluid" style="width: 100px;">
+					<img src="/images/gnolp.png" alt="Logo Truyen" srcset="" class="img-fluid" style="width: 100px;">
 				</a>
 				<button class="navbar-toggler" type="button" data-bs-toggle="offcanvas"
 					data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar">
@@ -553,7 +553,7 @@
 				<div class="offcanvas offcanvas-end text-bg-dark w-75" tabindex="-1" id="offcanvasDarkNavbar"
 					aria-labelledby="offcanvasDarkNavbarLabel">
 					<div class="offcanvas-header">
-						<img src="/images/logo.png" alt="Logo Truyen" srcset="" class="img-fluid" style="width: 100px;">
+						<img src="/images/gnolp.png" alt="Logo Truyen" srcset="" class="img-fluid" style="width: 100px;">
 						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
 							aria-label="Close"></button>
 					</div>
@@ -1144,12 +1144,13 @@
 						content: chapter.content,
 						id:chapter.id,
 					};
+					console.log("chapterData:",chapterData)
 					localStorage.setItem("story-name",story.title);
 					localStorage.setItem("story-id",story.id);
 					localStorage.setItem('selectedChapter', JSON.stringify(chapterData));
 					console.log("chapterdata:",chapterData);
 					console.log("story-name",localStorage.getItem("story-name"));									           
-					window.location.href = '/chapter';
+					//window.location.href = '/chapter';
 					
 				};
 

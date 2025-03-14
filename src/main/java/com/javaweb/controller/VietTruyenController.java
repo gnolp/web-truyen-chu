@@ -30,20 +30,12 @@ import com.javaweb.repository.ChapterInformation;
 
 @Controller
 public class VietTruyenController {
-	@GetMapping("/chapter")
-	public static String getChapter() {
-		return "chapter (1)";
-	}
 	@GetMapping("/dangtruyen")
 	public static String vietTruyen(HttpSession session) {
 		User user = (User) session.getAttribute("user");
 		if(user != null)
 			return "vt";
 		return "loginPlease";
-	}
-	@GetMapping("/story-details")
-	public static String getTruyen(){
-		return "story-details";
 	}
 	
 	@GetMapping("/them-truyen")

@@ -58,4 +58,18 @@ public class ResetPassword {
 	    response.put("message", "Password updated successfully");
 	    return ResponseEntity.ok(response);
 	}
+	@PostMapping("/change-password")
+	public ResponseEntity<Map<String, Object>> changePassword(
+	        @RequestParam("id") int id,
+	        @RequestBody Map<String, String> mp) {
+	    
+	    String newPassword = mp.get("newPassword");
+	    boolean ok = UserInformation.changePassword(newPassword, id);
+
+	    if (ok) {
+	        return ResponseEntity.ok(Map.of("success", true, "message", "Password changed successfully"));
+	    } else {
+	        return ResponseEntity.status(500).body(Map.of("success", false, "message", "Change password failed"));
+	    }
+	}
 }

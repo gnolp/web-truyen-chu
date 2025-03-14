@@ -10,6 +10,12 @@
 
 </head>
 <style>
+	#myTabContent {
+	    max-height: 300px; /* Đặt chiều cao tối đa */
+	    overflow-y: auto; /* Hiển thị thanh cuộn khi nội dung vượt quá */
+	    padding: 10px; /* Khoảng cách bên trong */
+	    border: 1px solid #ddd; /* Thêm viền để dễ nhìn */
+	}
     .c-tabs .nav-link.active {
         background-color: #182433 !important; /* Màu nền khi active */
         color: #DCE1E7 !important; /* Màu chữ khi active */
@@ -244,7 +250,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link d-flex gap-2" data-bs-toggle="tab" href="#User">
+                    <a class="nav-link d-flex gap-2" id="user-tab" data-bs-toggle="tab" href="#User">
                         <span class="">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-users" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -284,9 +290,9 @@
                                     <a class="text-white d-block rounded position-relative overflow-hidden text-decoration-none" href="#" style="background-color: #8bcd49;">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div class="details px-4 py-3 d-flex flex-column justify-content-between">
-                                                <div class="desc fw-medium">Views of the day</div>
+                                                <div class="desc fw-medium" >Views of the day</div>
                                                 <div class="number fw-bolder">
-                                                    <span data-counter="counterup" data-value="12">12</span>
+                                                    <span data-counter="counterup" id="views-of-the-day" data-value="12"></span>
                                                 </div>
                                             </div>
                                             <div class="visual ps-1 position-absolute end-0">
@@ -302,12 +308,12 @@
                                     </a>
                                 </div>
                                 <div class="col dashboard-widget-item col-12 col-md-6 col-lg-3">
-                                    <a class="text-white d-block rounded position-relative overflow-hidden text-decoration-none" href="#" style="background-color: #c85a5a;">
+                                    <a class="text-white d-block rounded position-relative overflow-hidden text-decoration-none" href="#" style="background-color: #c85a5a;" data-bs-toggle="modal" data-bs-target="#New-stories">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div class="details px-4 py-3 d-flex flex-column justify-content-between">
-                                                <div class="desc fw-medium">New Books</div>
+                                                <div class="desc fw-medium" >New Books</div>
                                                 <div class="number fw-bolder">
-                                                    <span data-counter="counterup" data-value="12">12</span>
+                                                    <span data-counter="counterup" id="new-books" data-value="12"></span>
                                                 </div>
                                             </div>
                                             <div class="visual ps-1 position-absolute end-0">
@@ -324,12 +330,12 @@
                                     </a>
                                 </div>
                                 <div class="col-12 dashboard-widget-item col-md-6 col-lg-3">
-                                    <a class="text-white d-block rounded position-relative overflow-hidden text-decoration-none" href="#" style="background-color: #4993cdeb;">
+                                    <a class="text-white d-block rounded position-relative overflow-hidden text-decoration-none" href="#User" style="background-color: #4993cdeb;" data-bs-toggle="tab" onclick="switchToUserTab()">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div class="details px-4 py-3 d-flex flex-column justify-content-between">
                                                 <div class="desc fw-medium">User</div>
                                                 <div class="number fw-bolder">
-                                                    <span data-counter="counterup" data-value="24">24</span>
+                                                    <span data-counter="counterup" id="users" data-value=""></span>
                                                 </div>
                                             </div>
                                             <div class="visual ps-1 position-absolute end-0">
@@ -344,12 +350,12 @@
                                     </a>
                                 </div>
                                 <div class="col-12 dashboard-widget-item col-md-6 col-lg-3">
-                                    <a class="text-white d-block rounded position-relative overflow-hidden text-decoration-none" href="#" style="background-color: #cd49a7;">
+                                    <a class="text-white d-block rounded position-relative overflow-hidden text-decoration-none" href="#" style="background-color: #cd49a7;"data-bs-toggle="modal" data-bs-target="#Show-Report">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div class="details px-4 py-3 d-flex flex-column justify-content-between">
                                                 <div class="desc fw-medium">New Report</div>
                                                 <div class="number fw-bolder">
-                                                    <span data-counter="counterup" data-value="1">1</span>
+                                                    <span data-counter="counterup" id="reports" data-value="1"></span>
                                                 </div>
                                             </div>
                                             <div class="visual ps-1 position-absolute end-0">
@@ -384,30 +390,8 @@
                                             <th style="text-align: center !important;">Chapter</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                1
-                                            </td>
-                                            <td>
-                                                <img src="/images/captain america brave new world.jpg" style="width: 65px;">
-                                            </td>
-                                            <td>
-                                                Phạm Ngọc Long
-                                            </td>
-                                            <td>
-                                                gnolp
-                                            </td>
-                                            <td>
-                                                25/1/2025
-                                            </td>
-                                            <td>
-                                                2
-                                            </td>
-                                            <td>
-                                                1022
-                                            </td>
-                                        </tr>
+                                    <tbody id="tbodyA">
+                                        
                                     </tbody>
                                 </table>
                             </div>
@@ -421,18 +405,18 @@
                         <div class="col-12 mt-4">
                             <div class="d-flex align-items-center p-2" style="box-shadow: 0 0 0 1px #1B293A;">
                                 <div class="d-flex">
-                                    <button class="btn me-3 d-flex" style="color:#DCE1E7;  text-align: center;margin-left: 2rem;box-shadow: 0 0 0 1px #1B293A;">Delete</button>
-                                    <div class="table-search-input">
+                                    <button class="btn me-3 d-flex btn-delete" style="color:#DCE1E7 !important;  text-align: center;margin-left: 2rem;box-shadow: 0 0 0 1px #1B293A;">Delete</button>
+                                    <div class="table-search-input S">
                                         <label>
                                             <div class="input-group">
                                                 <input type="search" placeholder="Title..." class="form-control" style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
                                             </div> 
                                         </label>
                                     </div>
-                                    <div class="table-search-input">
+                                    <div class="table-search-input S">
                                         <label>
                                             <div class="input-group">
-                                                <input type="search" placeholder="Authors..." class="form-control" style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
+                                                <input type="search" placeholder="Author..." class="form-control" style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
                                                     <span class="input-group-text" style="background-color:#151F2C; color:#DCE1E7; border:none !important">
                                                         <i class="bi bi-search"></i>
                                                     </span>
@@ -473,94 +457,8 @@
                                                 <th style="text-align: center !important;">Chapter</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <input type="checkbox">
-                                                </td>
-                                                <td>    
-                                                    1
-                                                </td>
-                                                <td>
-                                                    <img src="/images/captain america brave new world.jpg" style="width: 65px;">
-                                                </td>
-                                                <td>
-                                                    Phạm Ngọc Long
-                                                </td>
-                                                <td>
-                                                    gnolp
-                                                </td>
-                                                <td>
-                                                    Còn tiếp
-                                                </td>
-                                                <td>
-                                                    25/1/2025
-                                                </td>
-                                                <td>
-                                                    1000
-                                                </td>
-                                                <td>
-                                                    2
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <input type="checkbox">
-                                                </td>
-                                                <td>    
-                                                    1
-                                                </td>
-                                                <td>
-                                                    <img src="/images/captain america brave new world.jpg" style="width: 65px;">
-                                                </td>
-                                                <td>
-                                                    Phạm Ngọc Long
-                                                </td>
-                                                <td>
-                                                    gnolp
-                                                </td>
-                                                <td>
-                                                    Còn tiếp
-                                                </td>
-                                                <td>
-                                                    25/1/2025
-                                                </td>
-                                                <td>
-                                                    1000
-                                                </td>
-                                                <td>
-                                                    2
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <input type="checkbox">
-                                                </td>
-                                                <td>    
-                                                    1
-                                                </td>
-                                                <td>
-                                                    <img src="/images/captain america brave new world.jpg" style="width: 65px;">
-                                                </td>
-                                                <td>
-                                                    Phạm Ngọc Long
-                                                </td>
-                                                <td>
-                                                    gnolp
-                                                </td>
-                                                <td>
-                                                    Còn tiếp
-                                                </td>
-                                                <td>
-                                                    25/1/2025
-                                                </td>
-                                                <td>
-                                                    1000
-                                                </td>
-                                                <td>
-                                                    2
-                                                </td>
-                                            </tr>
+                                        <tbody id="TbodyS">
+                                            
                                         </tbody>
                                     </table>
                                 </div>
@@ -575,15 +473,15 @@
                         <div class="col-12 mt-4">
                             <div class="d-flex align-items-center p-2" style="box-shadow: 0 0 0 1px #1B293A;">
                                 <div class="d-flex">
-                                    <button class="btn me-3 d-flex" style="color:#DCE1E7;  text-align: center;margin-left: 2rem;box-shadow: 0 0 0 1px #1B293A;">Delete</button>
-                                    <div class="table-search-input">
+                                    <button class="btn me-3 d-flex btn-delete" style="color:#DCE1E7 !important;  text-align: center;margin-left: 2rem;box-shadow: 0 0 0 1px #1B293A;">Delete</button>
+                                    <div class="table-search-input U">
                                         <label>
-                                            <div class="input-group">
+                                            <div class="input-group ">
                                                 <input type="search" placeholder="Name..." class="form-control" style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
                                             </div> 
                                         </label>
                                     </div>
-                                    <div class="table-search-input">
+                                    <div class="table-search-input U">
                                         <label>
                                             <div class="input-group">
                                                 <input type="search" placeholder="Email..." class="form-control" style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
@@ -626,97 +524,11 @@
                                                 <th style="width: 250px;text-align: center !important;">Phone Number</th>
                                                 <th style="width: 250px;text-align: center !important;">Email</th>
                                                 <th style="text-align: center !important;">Create At</th>
-                                                <th style="text-align: center !important;">Story</th>
+                                                <th style="text-align: center !important;">Dob</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <input type="checkbox">
-                                                </td>
-                                                <td>    
-                                                    1
-                                                </td>
-                                                <td>
-                                                    <img src="/images/captain america brave new world.jpg" style="width: 65px;">
-                                                </td>
-                                                <td>
-                                                    Phạm Ngọc Long
-                                                </td>
-                                                <td>
-                                                    gnolp
-                                                </td>
-                                                <td>
-                                                    Null
-                                                </td>
-                                                <td>
-                                                    gnolp2513@gmail.com
-                                                </td>
-                                                <td>
-                                                    25-1-2025
-                                                </td>
-                                                <td>
-                                                    2
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <input type="checkbox">
-                                                </td>
-                                                <td>    
-                                                    1
-                                                </td>
-                                                <td>
-                                                    <img src="/images/captain america brave new world.jpg" style="width: 65px;">
-                                                </td>
-                                                <td>
-                                                    Phạm Ngọc Long
-                                                </td>
-                                                <td>
-                                                    gnolp
-                                                </td>
-                                                <td>
-                                                    Còn tiếp
-                                                </td>
-                                                <td>
-                                                    25/1/2025
-                                                </td>
-                                                <td>
-                                                    1000
-                                                </td>
-                                                <td>
-                                                    2
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <input type="checkbox">
-                                                </td>
-                                                <td>    
-                                                    1
-                                                </td>
-                                                <td>
-                                                    <img src="/images/captain america brave new world.jpg" style="width: 65px;">
-                                                </td>
-                                                <td>
-                                                    Phạm Ngọc Long
-                                                </td>
-                                                <td>
-                                                    gnolp
-                                                </td>
-                                                <td>
-                                                    Còn tiếp
-                                                </td>
-                                                <td>
-                                                    25/1/2025
-                                                </td>
-                                                <td>
-                                                    1000
-                                                </td>
-                                                <td>
-                                                    2
-                                                </td>
-                                            </tr>
+                                        <tbody id="tbodyU">
+                                            
                                         </tbody>
                                     </table>
                                 </div>
@@ -728,13 +540,13 @@
             <div class="tab-pane fade"  id="Admin" role="tabpanel">
                 <div class="container-fluid mt-5">
                     <ul class="nav c-tabs nav-tabs" id="myTab" role="tablist">
-                        <li class="nav-item" role="presentation">
+                        <li class="nav-item">
                             <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">User profile</button>
                         </li>
-                        <li class="nav-item" role="presentation">
+                        <li class="nav-item" >
                             <button class="nav-link" id="avatar-tab" data-bs-toggle="tab" data-bs-target="#avatar" type="button" role="tab">Avatar</button>
                         </li>
-                        <li class="nav-item" role="presentation">
+                        <li class="nav-item">
                             <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#password" type="button" role="tab">Change password</button>
                         </li>
                         
@@ -749,7 +561,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label b-form">Last Name *</label>
-                                        <input type="text" class="form-control" value="PTIT" style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
+                                        <input type="text" class="form-control" value="" style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
@@ -793,65 +605,132 @@
                     </div>
                 </div>
         </div>
+        <div id="New-stories" class="modal fade" tabindex="-1" aria-labelledby="newbooks">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #151F2C; color:whitesmoke">
+                        <span>Stories New</span>
+                    </div>
+                    <div class="container" style="background-color: #151F2C;">
+                        <div style="overflow:auto; max-height:500px">
+                            <table class="table" boder="1">
+                                <thead>
+                                    <tr>
+                                        <th style="width:20px;text-align: center !important">Id</th>
+                                        <th class="w-1 text-start" style="width: 100px;text-align: center !important;">Image</th>
+                                        <th class="text-start" style="width: 250px;text-align: center !important;">Title</th>
+                                        <th style="width: 250px;text-align: center !important;">Author</th>
+                                        <th style="width: 250px;text-align: center !important;">Created At</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stories-new">
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                
+            </div>
+        </div>
+        <div id="Show-Report" class="modal fade" tabindex="-1" aria-labelledby="report">
+            <div class="modal-dialog d-flex">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #151F2C;color:whitesmoke">
+                        <h3>Report</h3>
+                        <div class="ms-auto">
+                            <span class="mt-2">Slected has been seen</span>
+                        </div>
+                    </div>
+                    <div class="modal-body" style="background-color: #151F2C;color:whitesmoke">
+                        <div class="container" style="background-color: #182433;">
+                            
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        <div id="Show-author" class="modal fade" tabindex="-1" aria-labelledby="author">
+            <div class="modal-dialog d-flex">
+                <div class="modal-content" style="background-color: #212529;">
+                    <div class="container-fluid mt-5">
+                        <ul class="nav c-tabs nav-tabs">
+                            <li class="nav-item">
+                                <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profileA" type="button" role="tab">User profile</button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="avatar-tab" data-bs-toggle="tab" data-bs-target="#avatarA" type="button" role="tab">Avatar</button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#passwordA" type="button" role="tab">Change password</button>
+                            </li>
+                            <li class="nav-item"> 
+                                <button class="nav-link" id="story-tab" data-bs-toggle="tab" data-bs-target="#story-of-A" type="button" role="tab">Story</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content p-4  rounded-bottom" id="myTabContent" style="background-color: #182433;">
+                            <div class="tab-pane fade active show" id="profileA" role="tabpanel" aria-labelledby="profile-tab">
+                                <form>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label b-form">First Name *</label>
+                                            <input type="text" class="form-control" style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label b-form">Last Name *</label>
+                                            <input type="text" class="form-control" value="" style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label b-form">Username *</label>
+                                            <input type="text" class="form-control" style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7" readonly>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label b-form">Email *</label>
+                                            <input type="email" class="form-control" value="a" style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7" >
+                                        </div>
+                                    </div>
+                                    <button type="submit" id="update-author" class="btn btn-primary">Update</button>
+                                </form>
+                            </div>
+                            <div class="tab-pane fade" id="avatarA" role="tabpanel" aria-labelledby="avatar-tab">
+                                    <div class="mb-3 text-center">
+                                        <img id="avatar-previewA" src="" class="rounded-circle" width="150" height="150">
+                                    </div>
+                                    <div class="mb-3 text-center">
+                                        <input type="file" id="avatar-input" class="form-control" accept="image/*">
+                                    </div>
+                            </div>
+                            <div class="tab-pane fade" id="passwordA" role="tabpanel" aria-labelledby="password-tab">
+                                <div class="form-group">    
+                                    <label for="newPassword" class="b-form">New Password <span class="text-danger">*</span></label>
+                                    <input type="password" id="newPasswordA" class="form-control" required style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="confirmPassword" class="b-form" >Confirm New Password <span class="text-danger">*</span></label>
+                                    <input type="password" id="confirmPasswordA" class="form-control" required style="border-radius: 5px !important;background-color: #151F2C;border:none !important;box-shadow: 0 0 0 1px #1B293A !important; color:#DCE1E7">
+                                    <small class="text-danger d-none" id="passwordErrorA">Passwords do not match!</small>
+                                </div>
+								<div>
+									<button type="button" class="btn btn-danger" id="updatePassWord">Update</button>
+									</div>
+                            </div>
+                            <div class="tab-pane fade" id="story-of-A" role="tabpanel" aria-labelledby="story-tab">
+                                    <ul class="nav flex-column">
+                                        
+                                    </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <script>
-        document.getElementById("confirmPassword").addEventListener("input", function () {
-            let newPassword = document.getElementById("newPassword").value;
-            let confirmPassword = this.value;
-            let errorText = document.getElementById("passwordError");
-        
-            if (newPassword !== confirmPassword) {
-                this.classList.add("is-invalid");
-                errorText.classList.remove("d-none");
-            } else {
-                this.classList.remove("is-invalid");
-                errorText.classList.add("d-none");
-            }
-        });
-        document.getElementById("avatar-input").addEventListener("change", function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById("avatar-preview").src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-        document.querySelectorAll('.nav-tabs.T .nav-link[data-bs-toggle="tab"]').forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                let link = tab.getAttribute("href");
-                console.log('link',link);
-                document.querySelectorAll('.nav-tabs .nav-link[data-bs-toggle="tab"]').forEach(a => {
-                    a.classList.remove('active');
-                });
-                document.querySelectorAll(`[href="${link}"]`).forEach(a => {
-                    a.classList.add('active');
-                });
-        
-                document.querySelectorAll('.tab-pane').forEach(pane => {
-                    pane.classList.remove("show", "active");
-                });
-                let targetPane = document.querySelector(link);
-                if (targetPane) {
-                    targetPane.classList.add("show", "active");
-                }
-            });
-        });
-        document.getElementById('sidebarMenu').addEventListener('shown.bs.offcanvas', () => {
-            let activeTab = document.querySelector('.nav-tabs .nav-link.active');
-            if (activeTab) {
-                let link = activeTab.getAttribute("href");
-                    document.querySelectorAll(`[href="${link}"]`).forEach(a => {
-                    a.classList.add('active');
-                });
-        
-                let targetPane = document.getElementById(link);
-                if (targetPane) {
-                    targetPane.classList.add("show", "active");
-                }
-            }
-        });
-    </script>
+    <script src="/js/admin.js">
+		</script>
 </body>
 </html>

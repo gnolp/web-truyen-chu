@@ -4,8 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.javaweb.bean.Chapter;
 
@@ -154,4 +157,59 @@ public class ChapterInformation {
 			return rs > 0;
 		}
 	}
+	public static boolean addReport(String content, Integer chapterId) throws SQLException {
+		String sql = "insert into report (chapter_id,content) values (?,?)";
+		try(Connection conn = ConnectionDB.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)){
+			stmt.setInt(1, chapterId);
+			stmt.setString(2, content);
+			int rs = stmt.executeUpdate();
+			return rs > 0;
+		}
+	}
+	public static int getReport() throws SQLException {
+		String sql ="select count(*) as reports from report where had_seen = 0;";
+		try(Connection conn = ConnectionDB.getConnection();
+				Statement stmt = conn.createStatement()){
+			ResultSet rs = stmt.executeQuery(sql);
+			rs.next();
+			return rs.getInt("reports");
+		}
+	}
+	public static List<Map<String, String>> get_reports() throws SQLException {
+	    String sql = "SELECT " +
+	                 "    c.id AS chapter_id, " +
+	                 "    b.id AS book_id, " +
+	                 "    b.title AS book_title, " +
+	                 "    r.id AS report_id, " +
+	                 "    r.content AS report_content, " +
+	                 "    r.had_seen, " +
+	                 "    c.number AS chapter_number " +
+	                 "FROM report r " +
+	                 "JOIN chapter c ON r.chapter_id = c.id " +
+	                 "JOIN book b ON c.id_book = b.id where r.had_seen=0;";
+
+	    List<Map<String, String>> reports = new ArrayList<>();
+
+	    try (Connection conn = ConnectionDB.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql);
+	         ResultSet rs = stmt.executeQuery()) {
+
+	        while (rs.next()) {
+	            Map<String, String> mp = new HashMap<>();
+	            mp.put("chapter_id", rs.getString("chapter_id"));
+	            mp.put("book_id", rs.getString("book_id"));
+	            mp.put("book_title", rs.getString("book_title"));
+	            mp.put("report_id", rs.getString("report_id"));
+	            mp.put("report_content", rs.getString("report_content"));
+	            mp.put("had_seen", rs.getString("had_seen"));
+	            mp.put("chapter_number", rs.getString("chapter_number"));
+
+	            reports.add(mp);
+	        }
+	    }
+
+	    return reports;
+	}
+
 }

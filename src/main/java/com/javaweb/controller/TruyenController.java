@@ -14,8 +14,10 @@ import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,7 +50,7 @@ public class TruyenController {
 		return mp;
 	}
 	@GetMapping("/stories/{id}")
-	public static Map<String,Object> getTruyenByIdTheLoai(@PathVariable("id") int id) throws SQLException{
+	public Map<String,Object> getTruyenByIdTheLoai(@PathVariable("id") int id) throws SQLException{
 		Map<String,Object> mp = new HashMap<>();
 		List<Book> books = BookInformation.getBookByIdOfKind(id);
 		String nameTL = getTl(id);
@@ -59,17 +61,17 @@ public class TruyenController {
 		
 	}
 	@GetMapping("/stories-hot")
-	public static Map<String,Object> getTruyenHot() throws SQLException{
+	public  Map<String,Object> getTruyenHot() throws SQLException{
 		Map<String,Object> mp = new HashMap<>();
 		List<Book> books = BookInformation.getTruyenHot();
 		mp.put("stories", books);
 		return mp;
 	}
 	@GetMapping("/TheLoai/{theloai}")
-	public static int getIdTheLoai(@PathVariable("theloai") String tl) throws SQLException {
+	public  int getIdTheLoai(@PathVariable("theloai") String tl) throws SQLException {
 		return BookInformation.getIdTheLoai(tl);
 	}
-	public static String getTl(int id) throws SQLException {
+	public  String getTl(int id) throws SQLException {
 		return BookInformation.getTL(id);
 	}
 	@DeleteMapping("/delete-story/{id}")
@@ -94,7 +96,6 @@ public class TruyenController {
 	private String BASE_UPLOAD_DIR = "F:\\gt\\Jav\\test\\src\\main\\resources\\uploads\\user";
 	@PostMapping("/update-truyen")
 	public boolean updateStory(@RequestBody Map<String, Object> story) throws FileNotFoundException {
-	    // Giải mã các trường dữ liệu từ request body
 	    String title = (String) story.get("title");
 	    String genres = (String) story.get("genres");
 	    String description = (String) story.get("description");
@@ -158,10 +159,25 @@ public class TruyenController {
 		return ResponseEntity.ok(BookInformation.getCategory(book_id));
 	}
 	@GetMapping("/stories-new")
-	public static Map<String,Object> getTruyenNew() throws SQLException{
+	public Map<String,Object> getTruyenNew() throws SQLException{
 		Map<String,Object> mp = new HashMap<>();
 		List<Book> books = BookInformation.getTruyenNew(10);
 		mp.put("stories", books);
 		return mp;
+	}
+	@PostMapping("/report")
+	public ResponseEntity<String> report(@RequestBody Map<String,Object> mp) throws SQLException{
+		String content = mp.get("content").toString();
+		int chapterId = Integer.parseInt(mp.get("chapterId").toString());
+		boolean status = ChapterInformation.addReport(content,chapterId);
+		if(status) return ResponseEntity.ok("Thành công");
+		else return ResponseEntity.status(500).body("Không gửi được");
+	}
+	@PatchMapping("/increase-views")
+	public  void increaseViews(@RequestBody Map<String,Object> mp) throws SQLException{
+		int book_id = Integer.parseInt(mp.get("bookId").toString());
+		int chapter_id = Integer.parseInt(mp.get("chapterId").toString());
+		BookInformation.increaseViews(book_id,chapter_id);
+		
 	}
 }

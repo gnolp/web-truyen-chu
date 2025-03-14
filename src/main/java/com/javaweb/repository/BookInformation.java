@@ -39,20 +39,20 @@ public class BookInformation {
 	public static List<Book> getstories (long userId) throws SQLException{
 		List<Book> a = new ArrayList<>();
 		
-		String sql = "select * from [book] where author_id =?";
+		String sql = "select title,id,srcA from [book] where author_id =?";
 		try(Connection conn = ConnectionDB.getConnection();
 				PreparedStatement stmt = conn.prepareStatement(sql)){
 			stmt.setLong(1,userId);
 			ResultSet rs = stmt.executeQuery();
 			while(rs.next()) {
 				Book x = new Book();
-				x.setStatus(rs.getString("status"));
+				//x.setStatus(rs.getString("status"));
 				x.setTitle(rs.getString("title"));
-				x.setAuthor_id(rs.getLong("author_id"));
-				x.setCreated_at(rs.getDate("created_at"));
+				//x.setAuthor_id(rs.getLong("author_id"));
+				//x.setCreated_at(rs.getDate("created_at"));
 				x.setId(rs.getInt("id"));
-				x.setLuotdoc(rs.getInt("luot_doc"));
-				x.setUpdated_at(rs.getDate("updated_at"));
+				//x.setLuotdoc(rs.getInt("luot_doc"));
+				//x.setUpdated_at(rs.getDate("updated_at"));
 				x.setSrcA(rs.getString("srcA") != null ? rs.getString("srcA"):null);
 				
 				List<Chapter> so_chuong = ChapterInformation.getChaptersByBookId(x.getId());
@@ -107,15 +107,25 @@ public class BookInformation {
 		}
 		return list;
 	}
-	public static void increaseViews(int id) throws SQLException {
+	public static void increaseViews(int book_id, int chapter_id) throws SQLException {
 		String sql = "UPDATE Book\r\n"
 				+ "SET luot_doc = luot_doc + 1\r\n"
 				+ "WHERE id = ?;";
-		try(Connection conn = ConnectionDB.getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql)){
-			stmt.setInt(1, id);
-			stmt.executeUpdate();
-		}
+		String sql2 = "Insert into view_log(book_id,chapter_id) values (?,?)";
+		try (Connection conn = ConnectionDB.getConnection()) {
+	        // Cập nhật số lượt đọc
+	        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+	            stmt.setInt(1, book_id);
+	            stmt.executeUpdate();
+	        }
+
+	        // Ghi log lượt xem
+	        try (PreparedStatement stmt = conn.prepareStatement(sql2)) {
+	            stmt.setInt(1, book_id);
+	            stmt.setInt(2, chapter_id);
+	            stmt.executeUpdate();
+	        }
+	    }
 	}
 	public static Book getBookById(int id) {
 		String sql = "SELECT * FROM book WHERE id = ?";
@@ -137,7 +147,6 @@ public class BookInformation {
 				book.setSrcA(rs.getString("srcA") != null ? rs.getString("srcA"):null);
 				book.setUpdated_at(rs.getDate("updated_at"));
 			}
-			increaseViews(id);
 			return book;
 		} catch (SQLException e) {
 			
@@ -147,7 +156,7 @@ public class BookInformation {
 	}
 	public static List<Book> getBookByIdOfKind(int id) throws SQLException{
 		List<Book> books = new ArrayList<>();
-		String sql = "SELECT b.*\r\n"
+		String sql = "SELECT b.id, b.title,b.srcA,b.status\r\n"
 				+ "FROM book b\r\n"
 				+ "JOIN book_category bc ON b.id = bc.book_id\r\n"
 				+ "JOIN category c ON c.id = bc.category_id\r\n"
@@ -159,15 +168,15 @@ public class BookInformation {
 			while(rs.next()) {
 				Book book = new Book();
 				book.setStatus(rs.getString("status"));
-				book.setAuthor_id(rs.getLong("author_id"));
-				book.setCreated_at(rs.getDate("created_at"));
+				//book.setAuthor_id(rs.getLong("author_id"));
+				//book.setCreated_at(rs.getDate("created_at"));
 				book.setId(rs.getInt("id"));
-				book.setLuotdoc(rs.getInt("luot_doc"));
-				book.setMo_ta(rs.getString("mo_ta"));
-				book.setSo_chuong(rs.getInt("so_chuong"));
+				//book.setLuotdoc(rs.getInt("luot_doc"));
+				//book.setMo_ta(rs.getString("mo_ta"));
+				//book.setSo_chuong(rs.getInt("so_chuong"));
 				book.setTitle(rs.getString("title"));
 				book.setSrcA(rs.getString("srcA") != null ? rs.getString("srcA"):null);
-				book.setUpdated_at(rs.getDate("updated_at"));
+				//book.setUpdated_at(rs.getDate("updated_at"));
 				books.add(book);
 			}
 			return books;
@@ -177,7 +186,7 @@ public class BookInformation {
 	
 	public static List<Book> getTruyenHot() throws SQLException{
 		List<Book> books = new ArrayList<>();
-		String sql = "SELECT TOP 10 *\r\n"
+		String sql = "SELECT TOP 10 book.srcA,book.id,book.title,book.status\r\n"
 				+ "FROM book\r\n"
 				+ "ORDER BY luot_doc DESC;";
 		try(Connection conn = ConnectionDB.getConnection();
@@ -186,15 +195,15 @@ public class BookInformation {
 			while(rs.next()) {
 				Book book = new Book();
 				book.setStatus(rs.getString("status")+", hot");
-				book.setAuthor_id(rs.getLong("author_id"));
-				book.setCreated_at(rs.getDate("created_at"));
+				//book.setAuthor_id(rs.getLong("author_id"));
+				//book.setCreated_at(rs.getDate("created_at"));
 				book.setId(rs.getInt("id"));
-				book.setLuotdoc(rs.getInt("luot_doc"));
-				book.setMo_ta(rs.getString("mo_ta"));
-				book.setSo_chuong(rs.getInt("so_chuong"));
+				//book.setLuotdoc(rs.getInt("luot_doc"));
+				//book.setMo_ta(rs.getString("mo_ta"));
+				//book.setSo_chuong(rs.getInt("so_chuong"));
 				book.setTitle(rs.getString("title"));
 				book.setSrcA(rs.getString("srcA") != null ? rs.getString("srcA"):null);
-				book.setUpdated_at(rs.getDate("updated_at"));
+				//book.setUpdated_at(rs.getDate("updated_at"));
 				books.add(book);
 			}
 			return books;
@@ -390,24 +399,29 @@ public class BookInformation {
 	}
 	public static List<Book> getAllBook() throws SQLException{
 		List<Book> books = new ArrayList<>();
-		String sql = "select title, id,srcA from book;";
+		String sql = "SELECT b.id, b.title, b.srcA, b.status, b.created_at, b.luot_doc, b.so_chuong, a.butdanh AS author_name FROM book b JOIN auth_user a ON b.author_id = a.id;";
 		try (Connection conn = ConnectionDB.getConnection();
 		         PreparedStatement stmt = conn.prepareStatement(sql)) {
 			ResultSet rs = stmt.executeQuery();
-			while(rs.next()) {
-				Book a = new Book();
-				a.setTitle(rs.getString("title"));
-				a.setId(rs.getInt("id"));
-				a.setSrcA(rs.getString("srcA"));
-				books.add(a);
-			}
+			while (rs.next()) {
+                Book book = new Book();
+                book.setId(rs.getInt("id"));
+                book.setTitle(rs.getString("title"));
+                book.setSrcA(rs.getString("srcA"));
+                book.setStatus(rs.getString("status"));
+                book.setCreated_at(rs.getDate("created_at"));
+                book.setLuotdoc(rs.getInt("luot_doc"));
+                book.setSo_chuong(rs.getInt("so_chuong"));
+                book.setMo_ta(rs.getString("author_name"));
+                books.add(book);
+            }
 		}
 		return books;
 	}
 	public static List<Book> searchStories(String keysword) throws SQLException{
 		System.out.println(keysword);
 		List<Book> list = new ArrayList<>();
-		String sql = "SELECT *\r\n"
+		String sql = "SELECT book.id,book.title,book.srcA\r\n"
 				+ "FROM book\r\n"
 				+ "WHERE title COLLATE SQL_Latin1_General_CP1_CI_AI LIKE ?;";
 		try (Connection conn = ConnectionDB.getConnection();
@@ -416,11 +430,11 @@ public class BookInformation {
 			ResultSet rs = stmt.executeQuery();
 			while(rs.next()) {
 				Book a = new Book();
-				a.setAuthor_id(rs.getLong("author_id"));
+				//a.setAuthor_id(rs.getLong("author_id"));
 				a.setId(rs.getInt("id"));
 				a.setSrcA(rs.getString("srcA"));
-				a.setSo_chuong(rs.getInt("so_chuong"));
-				a.setStatus(rs.getString("status"));
+				//a.setSo_chuong(rs.getInt("so_chuong"));
+				//a.setStatus(rs.getString("status"));
 				a.setTitle(rs.getString("title"));
 				list.add(a);
 			}
@@ -448,7 +462,7 @@ public class BookInformation {
 	}
 	public static List<Book> getTruyenNew(int minLuotDoc) throws SQLException {
 	    List<Book> books = new ArrayList<>();
-	    String sql = "SELECT TOP 10 * " +
+	    String sql = "SELECT TOP 10 book.id, book.title,book.so_chuong " +
 	                 "FROM book " +
 	                 "WHERE luot_doc > ? " +
 	                 "ORDER BY updated_at DESC;";
@@ -460,19 +474,108 @@ public class BookInformation {
 
 	        while (rs.next()) {
 	            Book book = new Book();
-	            book.setStatus(rs.getString("status") + ", hot");
-	            book.setAuthor_id(rs.getLong("author_id"));
-	            book.setCreated_at(rs.getDate("created_at"));
+	            //book.setStatus(rs.getString("status") + ", hot");
+	            //book.setAuthor_id(rs.getLong("author_id"));
+	            //book.setCreated_at(rs.getDate("created_at"));
 	            book.setId(rs.getInt("id"));
-	            book.setLuotdoc(rs.getInt("luot_doc"));
-	            book.setMo_ta(rs.getString("mo_ta"));
+	            //book.setLuotdoc(rs.getInt("luot_doc"));
+	            //book.setMo_ta(rs.getString("mo_ta"));
 	            book.setSo_chuong(rs.getInt("so_chuong"));
 	            book.setTitle(rs.getString("title"));
-	            book.setSrcA(rs.getString("srcA") != null ? rs.getString("srcA") : null);
-	            book.setUpdated_at(rs.getDate("updated_at"));
+	            //book.setSrcA(rs.getString("srcA") != null ? rs.getString("srcA") : null);
+	            //book.setUpdated_at(rs.getDate("updated_at"));
 	            books.add(book);
 	        }
 	    }
 	    return books;
 	}
+	public static int getViews() throws SQLException{
+		String sql="SELECT COUNT(*) AS so_luot_xem\r\n"
+				+ "FROM view_log\r\n"
+				+ "WHERE read_at >= CONVERT(DATETIME, CONVERT(DATE, GETDATE()))\r\n"
+				+ "AND read_at < DATEADD(DAY, 1, CONVERT(DATETIME, CONVERT(DATE, GETDATE())));\r\n";
+		try(Connection conn = ConnectionDB.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)){
+			ResultSet rs = stmt.executeQuery();
+			rs.next();
+			return rs.getInt("so_luot_xem");
+		}
+	}
+	public static int getNewBooks() throws SQLException{
+		String sql="select count(*) as so_truyen_moi\r\n"
+				+ "from book\r\n"
+				+ "where created_at >= DATEADD(day,-150,convert(datetime, convert(date, getdate())))\r\n"
+				+ "and created_at < dateadd(day, 1, convert(datetime, convert(date, getdate())));";
+		try(Connection conn= ConnectionDB.getConnection();
+				Statement stmt = conn.createStatement()){
+			ResultSet rs = stmt.executeQuery(sql);
+			rs.next();
+			return rs.getInt("so_truyen_moi");
+		}
+	}
+	public static List<Book> get_New_Books() throws SQLException{
+		String sql="select b.id, b.title, b.srcA, b.status, b.created_at, b.luot_doc, b.so_chuong, a.butdanh AS author_name \r\n"
+				+ "FROM book b JOIN auth_user a ON b.author_id = a.id\r\n"
+				+ "where b.created_at >= DATEADD(day,-150,convert(datetime, convert(date, getdate())))\r\n"
+				+ "and b.created_at < dateadd(day, 1, convert(datetime, convert(date, getdate())));";
+		List<Book> books = new ArrayList<>();
+		try(Connection conn= ConnectionDB.getConnection();
+				Statement stmt = conn.createStatement()){
+			ResultSet rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+                Book book = new Book();
+                book.setId(rs.getInt("id"));
+                book.setTitle(rs.getString("title"));
+                book.setSrcA(rs.getString("srcA"));
+                book.setStatus(rs.getString("status"));
+                book.setCreated_at(rs.getDate("created_at"));
+                book.setLuotdoc(rs.getInt("luot_doc"));
+                book.setSo_chuong(rs.getInt("so_chuong"));
+                book.setMo_ta(rs.getString("author_name"));
+                books.add(book);
+            }
+		}
+		return books;
+	}
+	public static List<Book> searchBooks(String title, String author) {
+        List<Book> books = new ArrayList<>();
+        String sql = "SELECT b.id, b.title, b.srcA, b.status, b.created_at, b.luot_doc, b.so_chuong, a.butdanh AS author_name " +
+                     "FROM book b JOIN auth_user a ON b.author_id = a.id WHERE 1=1 ";
+
+        List<Object> params = new ArrayList<>();
+        if (title != null && !title.trim().isEmpty()) {
+            sql += " AND b.title LIKE ?";
+            params.add("%" + title.trim() + "%");
+        }
+        if (author != null && !author.trim().isEmpty()) {
+            sql += " AND a.butdanh LIKE ?";
+            params.add("%" + author.trim() + "%");
+        }
+
+        try (Connection conn = ConnectionDB.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Book book = new Book();
+                    book.setId(rs.getInt("id"));
+                    book.setTitle(rs.getString("title"));
+                    book.setSrcA(rs.getString("srcA"));
+                    book.setStatus(rs.getString("status"));
+                    book.setCreated_at(rs.getDate("created_at"));
+                    book.setLuotdoc(rs.getInt("luot_doc"));
+                    book.setSo_chuong(rs.getInt("so_chuong"));
+                    book.setMo_ta(rs.getString("author_name"));
+                    books.add(book);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return books;
+    }
 }
