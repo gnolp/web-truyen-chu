@@ -8,8 +8,6 @@ Web truyện chữ là một project đơn giản sử dụng java, spring, jdcb
 ![image](https://github.com/user-attachments/assets/36049a49-7829-41ba-bd93-1216586970de)
 ![image](https://github.com/user-attachments/assets/ef480777-9358-4c0c-8748-579f82a8267a)
 ![image](https://github.com/user-attachments/assets/ffc2a427-3b41-4117-a10e-2eeb0c5989da)
-![image](https://github.com/user-attachments/assets/d249e0a0-58f4-4964-8bf5-41f349ded52e)
-![image](https://github.com/user-attachments/assets/eece1222-0823-4abb-a46c-4b98f0368d00)
 ![image](https://github.com/user-attachments/assets/57a8d347-ff8c-4597-8a6f-e2b548c77680)
 
 ### Admin
