@@ -282,14 +282,34 @@ public class BookInformation {
 	}
 	
 	public static boolean updateTruyen(String title, String[] genres,String description,String imageSrc, int author_id, int book_id,String status) {
-		String updateBookSql = "UPDATE book SET title = ?, mo_ta = ?, srcA = ? ,status = ? WHERE id = ?";
+	    StringBuilder updateBookSql = new StringBuilder("UPDATE book SET ");
+
+	    if (title != null && !title.isEmpty()) {
+	    	updateBookSql.append("title = ?, ");
+	        
+	    }
+	    if (description != null && !description.isEmpty()) {
+	    	updateBookSql.append("mo_ta = ?, ");
+	        
+	    }
+	    if (imageSrc != null && !imageSrc.isEmpty()) {
+	    	updateBookSql.append("srcA = ?, ");
+	        
+	    }
+	    if (status != null && !status.isEmpty()) {
+	    	updateBookSql.append("status = ?, ");
+	        
+	    }
+
+	    updateBookSql.setLength(updateBookSql.length() - 2);
+	    updateBookSql.append(" WHERE id = ?");
 	    String deleteCategoriesSql = "DELETE FROM book_category WHERE book_id = ?";
 	    String insertCategorySql = "INSERT INTO book_category (book_id, category_id) VALUES (?, ?)";
 	    try (Connection conn = ConnectionDB.getConnection()) {
 	        conn.setAutoCommit(false);
 
 	        
-	        try (PreparedStatement updateStmt = conn.prepareStatement(updateBookSql)) {
+	        try (PreparedStatement updateStmt = conn.prepareStatement(updateBookSql.toString())) {
 	            updateStmt.setString(1, title);
 	            updateStmt.setString(2, description);
 	            updateStmt.setString(3, imageSrc);

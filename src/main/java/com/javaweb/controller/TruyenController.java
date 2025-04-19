@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.io.FileOutputStream;
 import org.apache.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.javaweb.bean.Book;
 import com.javaweb.bean.Category;
@@ -28,10 +30,15 @@ import com.javaweb.bean.Chapter;
 import com.javaweb.repository.BookInformation;
 import com.javaweb.repository.ChapterInformation;
 import com.javaweb.repository.UserInformation;
+import com.javaweb.service.CloudinaryService;
 
 @RestController
 public class TruyenController {
-
+	private final CloudinaryService cloudinaryService;
+    @Autowired
+    public TruyenController(CloudinaryService cloudinaryService) {
+        this.cloudinaryService = cloudinaryService;
+    }
 	@GetMapping("/story/{id}")
 	public Map<String,Object> getTruyen(@PathVariable("id") int id){
 		Map<String,Object> mp = new HashMap<>();
@@ -93,52 +100,27 @@ public class TruyenController {
             return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body("Không tìm thấy truyện ");
         }
     }
-	private String BASE_UPLOAD_DIR = "F:\\gt\\Jav\\test\\src\\main\\resources\\uploads\\user";
 	@PostMapping("/update-truyen")
-	public boolean updateStory(@RequestBody Map<String, Object> story) throws FileNotFoundException {
-	    String title = (String) story.get("title");
-	    String genres = (String) story.get("genres");
-	    String description = (String) story.get("description");
-	    String image = (String) story.get("image");
-	    String status = (String) story.get("status");
-	    int authorId = (int) story.get("author_id");
-	    int storyId = (int) story.get("story_id");
-	    String imageSrc = null;
-	    if (image != null && image.contains("data:image")) {
-	        try {
-	            
-	            String base64Image = image.split("base64,")[1];
-	            byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+	public boolean updateStory(
+	        @RequestParam("title") String title,
+	        @RequestParam("genres") String genres,
+	        @RequestParam("description") String description,
+	        @RequestParam(value = "image", required = false) MultipartFile image,
+	        @RequestParam("status") String status,
+	        @RequestParam("author_id") int authorId,
+	        @RequestParam("story_id") int storyId) throws IOException {
 
-	            
-	            String uploadDirPath = BASE_UPLOAD_DIR + File.separator + "id" + authorId + File.separator + "stories";
-	            File uploadDir = new File(uploadDirPath);
+	    String imageSrc = "";
+	    String[] tloai = genres.split(", ");
 
-	            
-	            if (!uploadDir.exists()) {
-	                uploadDir.mkdirs();
-	            }
-	            String fileName = "truyen"+storyId + ".jpg";
-	            File outputFile = new File(uploadDir, fileName);
-
-	            
-	            try (FileOutputStream fileOutputStream = new FileOutputStream(outputFile)) {
-	                fileOutputStream.write(imageBytes);
-	            }
-	            imageSrc = "/uploads/user/id" + authorId + "/stories/" + fileName;
-	        } catch (IOException e) {
-	            e.printStackTrace(); 
-	            return false;
-	        }
-	    } else {
-	    	imageSrc = image;
+	    // Nếu có ảnh mới, tải lên Cloudinary
+	    if (image != null && !image.isEmpty()) {
+	        imageSrc = cloudinaryService.uploadFile(image);
 	    }
-	    String tloai[] = genres.split(", ");
-	    System.out.println(title+" " + genres + " "+ description+ "  "+ imageSrc+" "+authorId+" "+ storyId);
-	    boolean update = BookInformation.updateTruyen(title, tloai, description, imageSrc, authorId, storyId,status);
-	    if(update)
-	    	return true;
-	    return false;
+
+	    boolean update = BookInformation.updateTruyen(title, tloai, description, imageSrc, authorId, storyId, status);
+
+	    return update;
 	}
 	
 	@GetMapping("/search-stories")
@@ -179,5 +161,12 @@ public class TruyenController {
 		int chapter_id = Integer.parseInt(mp.get("chapterId").toString());
 		BookInformation.increaseViews(book_id,chapter_id);
 		
+	}
+	@GetMapping("/get/content/{chapter_id}")
+	public ResponseEntity<Map<String,String>> getContent(@PathVariable("chapter_id") int id) throws SQLException{
+		Map<String,String> mp = new HashMap<>();
+		String content = ChapterInformation.getContentById(id);
+		mp.put("content", content);
+		return ResponseEntity.ok(mp);
 	}
 }

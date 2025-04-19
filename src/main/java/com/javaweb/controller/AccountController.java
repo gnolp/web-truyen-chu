@@ -16,9 +16,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.view.RedirectView;
@@ -29,11 +31,15 @@ import com.javaweb.bean.User;
 import com.javaweb.repository.BookInformation;
 import com.javaweb.repository.ChapterInformation;
 import com.javaweb.repository.UserInformation;
+import com.javaweb.service.CloudinaryService;
 import com.sun.mail.iap.Response;
 @Controller
 public class AccountController {
-    
+	private final CloudinaryService cloudinaryService;
 
+    public AccountController(CloudinaryService cloudinaryService) {
+        this.cloudinaryService = cloudinaryService;
+    }
     @GetMapping("/account")
     public String  getAccount(@RequestParam("userId") long userId, Model model, HttpSession session ) {
         User user = (User) session.getAttribute("user");
@@ -64,81 +70,47 @@ public class AccountController {
         	return ResponseEntity.ok(stories);
         }
 
-        private String BASE_UPLOAD_DIR = "F:\\gt\\Jav\\test\\src\\main\\resources\\uploads\\user";
 
 
         @PostMapping("/update")
         public ResponseEntity<String> updateProfile(
-        		@RequestParam(value ="id") long userId,
-                @RequestParam(value ="avatar", required = false) MultipartFile avatar,
-                @RequestParam(value ="firstName", required = false) String firstName,
-                @RequestParam(value ="lastName", required = false) String lastName,
-                @RequestParam(value ="soDienThoaiInput", required = false) String soDienThoai,
-                @RequestParam(value ="emailInput", required = false) String email,
-                @RequestParam(value ="gioiTinhInput", required = false) String gioiTinh,
-                @RequestParam(value ="butDanhInput", required = false) String butDanh,
-                @RequestParam(value ="namSinhInput", required = false) Integer namSinh) {
-        		
-        	
+                @RequestParam(value = "id") long userId,
+                @RequestParam(value = "avatar", required = false) MultipartFile avatar,
+                @RequestParam(value = "firstName", required = false) String firstName,
+                @RequestParam(value = "lastName", required = false) String lastName,
+                @RequestParam(value = "soDienThoaiInput", required = false) String soDienThoai,
+                @RequestParam(value = "emailInput", required = false) String email,
+                @RequestParam(value = "gioiTinhInput", required = false) String gioiTinh,
+                @RequestParam(value = "butDanhInput", required = false) String butDanh,
+                @RequestParam(value = "namSinhInput", required = false) Integer namSinh) {
 
-            
-            String uploadDirPath = BASE_UPLOAD_DIR + File.separator + "id" + userId + File.separator + "avt";
-            
-            	System.out.println("dòng 92 accountController");
-            	try {
-            	    Path path = null;
-            	    if (avatar != null && !avatar.isEmpty()) {
-            	        File uploadDir = new File(uploadDirPath);
-            	        if (!uploadDir.exists()) {
-            	            uploadDir.mkdirs();
-            	        }
+            try {
+                User a = UserInformation.getUserInformation(userId);
 
-            	        // Tạo file để lưu
-            	        String fileName = "avatar_" + userId + ".png";
-            	        path = Path.of(uploadDirPath + File.separator + fileName);
-            	        Files.copy(avatar.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-            	    }
+                // Cập nhật thông tin
+                if (butDanh != null) a.setButdanh(butDanh);
+                if (email != null) a.setEmail(email);
+                if (firstName != null) a.setFirstName(firstName);
+                if (gioiTinh != null) a.setGioitinh(gioiTinh);
+                if (lastName != null) a.setLastName(lastName);
+                if (soDienThoai != null) a.setPhonenumber(soDienThoai);
+                if (namSinh != null && namSinh != 0) a.setNamsinh(namSinh);
 
-            	    // Lưu thông tin người dùng
-            	    System.out.println("id: " + userId);
-            	    System.out.println("Avatar saved at: " + path);
-            	    System.out.println("Tên hiển thị: " + firstName + " " + lastName);
-            	    System.out.println("Số điện thoại: " + soDienThoai);
-            	    System.out.println("Email: " + email);
-            	    System.out.println("Giới tính: " + gioiTinh);
-            	    System.out.println("Bút danh: " + butDanh);
-            	    
-					System.out.println("Năm sinh: " + namSinh);
+                
+                if (avatar != null && !avatar.isEmpty()) {
+                    String cloudinaryUrl = cloudinaryService.uploadFile(avatar);
+                    a.setScrA(cloudinaryUrl);
+                }
 
-            	    User a = UserInformation.getUserInformation(userId);
-            	    if (butDanh != null) a.setButdanh(butDanh);
-            	    if (email != null) a.setEmail(email);
-            	    if (firstName != null) a.setFirstName(firstName);
-            	    if (gioiTinh != null) a.setGioitinh(gioiTinh);
-            	    if (lastName != null) a.setLastName(lastName);
-            	    if (soDienThoai != null) a.setPhonenumber(soDienThoai);
-            	    if (namSinh != null && namSinh != 0) a.setNamsinh(namSinh);
-
-            	    // Cập nhật đường dẫn ảnh (nếu có)
-            	    if (path != null) {
-            	        a.setScrA(path.toString().substring(33));
-            	    }
-
-            	    // Cập nhật thông tin người dùng
-            	    if (UserInformation.updateUserInformation(a)) {
-            	    	System.out.println("ok");
-            	        return ResponseEntity.ok("Cập nhật thành công");
-            	    } else {
-            	    	System.out.println("sai ở đây");
-            	        return ResponseEntity.status(500).body("Cập nhật thất bại");
-            	    }
-            	} catch (IOException e) {
-            	    // Log lỗi chi tiết
-            		System.out.println("sai ở đây2");
-            	    e.printStackTrace();
-            	    return ResponseEntity.status(500).body("Lỗi khi lưu ảnh");
-            	}
-
+                if (UserInformation.updateUserInformation(a)) {
+                    return ResponseEntity.ok("Cập nhật thành công, avatar: " + a.getScrA());
+                } else {
+                    return ResponseEntity.status(500).body("Cập nhật thất bại");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return ResponseEntity.status(500).body("Lỗi khi upload ảnh");
+            }
         }
         @PostMapping("/add-to-bookshelve")
         public ResponseEntity<String> addToBookshelve(@RequestBody Map<String,Object> mp) throws SQLException{
@@ -150,7 +122,40 @@ public class AccountController {
         	if(up) return ResponseEntity.ok("done");
         	else return ResponseEntity.status(500).body("false");
         }
-        
+    
+        @ResponseBody
+    	@GetMapping("/user-info/{id}")
+        public ResponseEntity<Map<String, Object>> getUserInfo(@PathVariable("id") int requestedUserId,
+                HttpSession session) {
+    		
+    					Integer sessionUserId = (int) session.getAttribute("userId");
+    					System.out.println("day la trong user-info:" + sessionUserId);
+    					boolean isSelf = sessionUserId != null && sessionUserId==requestedUserId;
+    					User user = UserInformation.getUserInformation(requestedUserId);
+    		        
+    					if (user == null) {
+    						System.out.println("null roi");
+    			            return ResponseEntity.notFound().build();
+    			        }
+
+    			        Map<String, Object> response = new HashMap<>();
+    			        response.put("name", user.getFirstName()+" "+user.getLastName());
+    			        response.put("email", user.getEmail());
+    			        response.put("phonenumber", user.getPhonenumber());
+    			        response.put("butdanh", user.getButdanh());
+    			        response.put("gioitinh", user.getGioitinh());
+    			        if(user.getScrA()!=null)
+    			        	response.put("srcA", user.getScrA().replace("\\", "/"));
+    			        else response.put("srcA", user.getScrA());
+    			        response.put("namsinh", user.getNamsinh());
+    			        response.put("firstName",user.getFirstName());
+    			        response.put("lastName",user.getLastName());
+    			        response.put("isSelf", isSelf);
+    			        for(String x: response.keySet()) {
+    			        	System.out.println(x +"	 : "+response.get(x));
+    			        }
+    			        return ResponseEntity.ok(response);
+    			    }
 }
              
 

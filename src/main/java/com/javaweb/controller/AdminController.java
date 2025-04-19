@@ -94,7 +94,7 @@ public class AdminController {
 	public ResponseEntity<List<Book>> searchtStory(
 	        @RequestParam(required = false) String title,
 	        @RequestParam(required = false) String author) {
-	    
+	    System.out.println(author);
 	    List<Book> Books = BookInformation.searchBooks(title, author);
 	    return ResponseEntity.ok(Books);
 	}

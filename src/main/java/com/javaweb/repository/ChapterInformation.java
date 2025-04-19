@@ -80,7 +80,7 @@ public class ChapterInformation {
 	
 	public static List<Chapter> getChaptersByBookId(int idBook) throws SQLException {
         List<Chapter> chapters = new ArrayList<>();
-        String sql = "SELECT * FROM chapter WHERE id_book = ? ORDER BY number";
+        String sql = "SELECT id,title,number FROM chapter WHERE id_book = ? ORDER BY number";
         try(Connection conn = ConnectionDB.getConnection();
 				PreparedStatement stmt = conn.prepareStatement(sql)){
         	stmt.setInt(1, idBook);
@@ -89,9 +89,9 @@ public class ChapterInformation {
                 int id = rs.getInt("id");
                 String title = rs.getString("title");
                 int number = rs.getInt("number");
-                String content = rs.getString("content");
+                //String content = rs.getString("content");
                 Chapter a = new Chapter();
-                a.setContent(content);
+                //a.setContent(content);
                 a.setId_book(idBook);
                 a.setNumber(number);
                 a.setTitle(title);
@@ -210,6 +210,20 @@ public class ChapterInformation {
 	    }
 
 	    return reports;
+	}
+	public static String getContentById(int id) throws SQLException {
+	    String sql = "SELECT content FROM chapter WHERE id = ?";
+	    try (Connection conn = ConnectionDB.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+	        stmt.setInt(1, id);
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            if (rs.next()) {
+	                return rs.getString("content");
+	            } else {
+	                return null;
+	            }
+	        }
+	    }
 	}
 
 }

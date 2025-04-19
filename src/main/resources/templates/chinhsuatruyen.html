@@ -404,7 +404,7 @@
 		<div class="left-section">
 			<div class="image-upload">
 				<label for="storyImage">Tải lên ảnh truyện:</label>
-				<input type="file" id="storyImage" accept="image/*" onchange="previewImage(event)"><br><br>
+				<input type="file" id="uploadedImageInput" accept="image/*" onchange="previewImage(event)"><br><br>
 			</div>
 			<div class="image-preview" id="imagePreview">
 				<img id="uploadedImage" style="display: none;">
@@ -713,7 +713,7 @@
 				}
 				reader.readAsDataURL(file);
 			} else {
-				//imagePreview.innerHTML = 'Chưa có hình ảnh nào được tải lên.';
+				
 			}
 		}
 
@@ -738,60 +738,67 @@
 
 
 		function saveChanges() {
-			const data = JSON.parse(localStorage.getItem("data"));
+		    const data = JSON.parse(localStorage.getItem("data"));
 
-			// Lấy tên truyện
-			const title = document.getElementById("storyTitle").value;
+		    // Lấy giá trị từ các trường nhập liệu
+		    const title = document.getElementById("storyTitle").value;
+		    const description = document.getElementById("storyDescription").value;
+		    const status = document.getElementById("status").value;
 
-			// Lấy mô tả
-			const description = document.getElementById("storyDescription").value;
-			const status = document.getElementById("status").value;
-			// Lấy thể loại đã chọn
-			const selectedGenres = [];
-			const checkboxes = document.querySelectorAll("#genreList input[type='checkbox']");
-			checkboxes.forEach((checkbox) => {
-				if (checkbox.checked) {
-					selectedGenres.push(checkbox.value);
-				}
-			});
+		    // Lấy danh sách thể loại đã chọn
+		    const selectedGenres = [];
+		    const checkboxes = document.querySelectorAll("#genreList input[type='checkbox']");
+		    checkboxes.forEach((checkbox) => {
+		        if (checkbox.checked) {
+		            selectedGenres.push(checkbox.value);
+		        }
+		    });
 
-			// Lấy hình ảnh (nếu người dùng đã tải lên ảnh mới)
-			const img = document.getElementById("uploadedImage");
-			const imageSrc = img.src.startsWith("data:") ? img.src : data.story.srcA;
-			const author_id = data.story.author_id;
-			const story_id = data.story.id;
-			// Tạo đối tượng dữ liệu để gửi về backend
-			const data1 = {
-				status: status,
-				title: title,
-				genres: selectedGenres.join(", "), // Ghép các thể loại thành chuỗi
-				description: description,
-				image: imageSrc,
-				author_id: author_id,
-				story_id: story_id,
-			};
-			console.log("data1: ", data1);
+		    // Lấy hình ảnh nếu người dùng tải lên mới
+		    const imageInput = document.getElementById("uploadedImageInput"); // Giả sử input file có id này
+		    const imageFile = imageInput.files.length > 0 ? imageInput.files[0] : null;
 
-			fetch("/update-truyen", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(data1),
-			})
-				.then((response) => response.text())
-				.then((result) => {
-					if (result === "true") {
-						alert("Thay đổi đã được lưu thành công!");
-					} else {
-						alert("Có lỗi xảy ra khi lưu thay đổi!");
-					}
-				})
-				.catch((error) => {
-					console.error("Lỗi khi gửi yêu cầu:", error);
-					alert("Không thể lưu thay đổi. Vui lòng thử lại!");
-				});
+		    // Lấy thông tin truyện cũ từ localStorage
+		    const author_id = data.story.author_id;
+		    const story_id = data.story.id;
+
+		    // Tạo FormData để gửi dữ liệu (thay vì JSON thuần)
+		    const formData = new FormData();
+		    formData.append("title", title);
+		    formData.append("genres", selectedGenres.join(", ")); // Ghép thể loại thành chuỗi
+		    formData.append("description", description);
+		    formData.append("status", status);
+		    formData.append("author_id", author_id);
+		    formData.append("story_id", story_id);
+
+		    // Nếu có ảnh mới, gửi ảnh; nếu không, gửi link ảnh cũ
+		    if (imageFile) {
+		        formData.append("image", imageFile);
+		    } else {
+		        formData.append("image", data.story.srcA); // Ảnh cũ
+		    }
+
+		    console.log("FormData: ", formData);
+
+		    // Gửi request đến server
+		    fetch("/update-truyen", {
+		        method: "POST",
+		        body: formData,
+		    })
+		        .then((response) => response.text())
+		        .then((result) => {
+		            if (result === "true") {
+		                alert("Thay đổi đã được lưu thành công!");
+		            } else {
+		                alert("Có lỗi xảy ra khi lưu thay đổi!");
+		            }
+		        })
+		        .catch((error) => {
+		            console.error("Lỗi khi gửi yêu cầu:", error);
+		            alert("Không thể lưu thay đổi. Vui lòng thử lại!");
+		        });
 		}
+
 
 		function cancel() {
 			if (confirm("Bạn có chắc chắn muốn hủy không?")) {

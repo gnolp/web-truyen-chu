@@ -1,8 +1,6 @@
 package com.javaweb.controller;
 import com.javaweb.bean.User;
 import com.javaweb.repository.UserInformation;
-
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,10 +8,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.servlet.http.HttpSession;
 @Controller
 public class LoginController {
@@ -46,19 +40,8 @@ public class LoginController {
 		redirectAttributes.addAttribute("error", "true");
 		return new RedirectView("/login");
 	}
-	@GetMapping("/session")
-    public ResponseEntity<Map<String, Object>> getSessionUser(HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
-        
-        User user = (User) session.getAttribute("user");
-        if (user != null) {
-            response.put("loggedIn", true);
-            response.put("userId", user.getId());
-            response.put("firstName", user.getFirstName());
-        } else {
-            response.put("loggedIn", false);
-        }
-
-        return ResponseEntity.ok(response);
-    }
+	@GetMapping("")
+	public String getHome() {
+		return "index";
+	}
 }

@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const data = JSON.parse(localStorage.getItem("data"));
 
   if (data) {
-    // Gọi hàm hiển thị dữ liệu
     displayStoryData(data);
     displayChapters(data);
   }
@@ -33,6 +32,7 @@ const chaptersPerPage = 25;
 
 function displayChapters(data) {
   const totalChapters = data.Chuong;
+  console.log("totalChapters:",totalChapters);
   const chapterListDiv = document.getElementById("chapter-list");
   chapterListDiv.innerHTML = ""; // Xóa nội dung cũ
 
@@ -59,11 +59,14 @@ function displayChapters(data) {
     chapterDiv.style.cursor = "pointer";
 
     // Thêm sự kiện click , lưu chương vào localStorage
-    chapterDiv.addEventListener("click", function () {
+   	chapterDiv.addEventListener("click", async function () {
+      const response = await fetch(`/get/content/${chapter.id}`);
+      const data_content = await response.json();
+      content = data_content.content;
       const chapterData = {
         number: chapter.number,
         title: chapter.title,
-        content: chapter.content,
+        content: content,
         id: chapter.id,
       };
 	  const viewsLog={
@@ -81,9 +84,10 @@ function displayChapters(data) {
         "selectedChapter",
         JSON.stringify(chapterData)
       );
+      localStorage.setItem("allChapters",JSON.stringify(totalChapters));
       console.log("chapterdata:", chapterData);
       // Chuyển hướng sang trang chapter.html
-      window.location.href = "/chapter.html";
+      window.location.href = "/chapter";
     });
 
     // Phân chia chương vào 2 cột
@@ -194,7 +198,7 @@ function showSearchResult(stories) {
         console.log("Dữ liệu chi tiết:", data);
 
         localStorage.setItem("data", JSON.stringify(data));
-        window.location.href = "/story-details.html";
+        window.location.href = "/story-details";
       } catch (error) {
         console.error("Lỗi khi lấy chi tiết truyện:", error);
       }
@@ -268,7 +272,7 @@ document.querySelectorAll(".dropdown-item").forEach((item) => {
         localStorage.setItem("TheLoai", JSON.stringify(data.TheLoai));
         console.log(data);
 
-        window.location.href = "/category.html";
+        window.location.href = "/category";
       }
     } catch (error) {
       console.error("Error fetching stories:", error);
@@ -326,7 +330,7 @@ document.querySelectorAll(".story-item-no-image").forEach((storyItem) => {
 
       localStorage.setItem("data", JSON.stringify(data));
 
-      window.location.href = "/story-details.html";
+      window.location.href = "/story-details";
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu truyện:", error);
     }
@@ -334,7 +338,6 @@ document.querySelectorAll(".story-item-no-image").forEach((storyItem) => {
 });
 
 //5
-// Hàm để gửi tên truyện và chuyển hướng đến trang chi tiết truyện
 async function sendStoryName(element) {
   console.log("đã vào hàm sendStoryName!");
 
@@ -347,7 +350,7 @@ async function sendStoryName(element) {
     const data = await response.json();
     console.log("truyện đã được click:", data);
     localStorage.setItem("data", JSON.stringify(data));
-    window.location.href = "/story-details.html";
+    window.location.href = "/story-details";
   } catch (error) {
     console.error("Lỗi khi lấy dữ liệu truyện:", error);
   }
@@ -364,7 +367,7 @@ async function sendCategoryName(element) {
 	        localStorage.setItem("TheLoai", JSON.stringify(data.TheLoai));
 	        console.log(data);
 
-	        window.location.href = "/category.html";
+	        window.location.href = "/category";
 	      }
     } catch (error) {
     console.error("Error fetching stories:", error);
@@ -432,7 +435,7 @@ function showSearchResultNav(stories) {
         console.log("Dữ liệu chi tiết:", data);
 
         localStorage.setItem("data", JSON.stringify(data));
-        window.location.href = "/story-details.html";
+        window.location.href = "/story-details";
       } catch (error) {
         console.error("Lỗi khi lấy chi tiết truyện:", error);
       }
@@ -554,7 +557,7 @@ document.querySelectorAll(".category-name").forEach((item) => {
           localStorage.setItem("TheLoai", JSON.stringify(data.TheLoai));
           console.log(data);
   
-          window.location.href = "/category.html";
+          window.location.href = "/category";
         }
       } catch (error) {
         console.error("Error fetching stories:", error);
@@ -573,7 +576,7 @@ document.querySelectorAll(".category-name").forEach((item) => {
             const data = await response.json();
             console.log("truyện đã được click:", data);
             localStorage.setItem("data", JSON.stringify(data));
-            window.location.href = "/story-details.html";
+            window.location.href = "/story-details";
           } catch (error) {
             console.error("Lỗi khi lấy dữ liệu truyện:", error);
           }

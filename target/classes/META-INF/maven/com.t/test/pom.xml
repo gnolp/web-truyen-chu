@@ -11,10 +11,16 @@
 		<version>2.7.6</version>
 	</parent>
 	<repositories>
-    <repository>
-        <id>google-maven-repo</id>
-        <url>https://maven.google.com</url>
+	<repository>
+        <id>jcenter</id>
+        <url>https://jcenter.bintray.com/</url>
     </repository>
+    
+    <repository>
+        <id>central</id>
+        <url>https://repo.maven.apache.org/maven2/</url>
+    </repository>
+
 </repositories>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -25,7 +31,7 @@
 			<dependency>
 				<groupId>com.microsoft.sqlserver</groupId>
 				<artifactId>mssql-jdbc</artifactId>
-				<version>10.2.1.jre8</version> <!-- Chỉ định phiên bản muốn sử dụng -->
+				<version>10.2.1.jre8</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -64,8 +70,7 @@
 	    	<groupId>org.springframework.boot</groupId>
 	    	<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
-		
-		
+			
 		
 		<dependency>
 		    <groupId>com.google.api-client</groupId>
@@ -83,7 +88,11 @@
 		    <version>v1-rev83-1.23.0</version>
 		</dependency>
 	
-	
-		
+		<dependency>
+	    <groupId>com.cloudinary</groupId>
+	    <artifactId>cloudinary-http45</artifactId>
+	    <version>1.39.0</version>
+	</dependency>
+
 	</dependencies>
 </project>

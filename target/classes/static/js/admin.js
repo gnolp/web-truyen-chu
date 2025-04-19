@@ -105,7 +105,16 @@ function fillModalData(data) {
   document.querySelector("#profileA input[type='email']").value = data.email || "";
   
   document.querySelector("#avatar-previewA").src = data.srcA || "/images/default-avatar.jpg";
-
+  document.getElementById("avatar-inputA").addEventListener("change", function(event) {
+              const file = event.target.files[0];
+              if (file) {
+                  const reader = new FileReader();
+                  reader.onload = function(e) {
+                      document.getElementById("avatar-previewA").src = e.target.result;
+                  };
+                  reader.readAsDataURL(file);
+              }
+          });
   let storyList = document.querySelector("#story-of-A ul");
   storyList.innerHTML = (data.books || []).map(story => `
       <li class="nav-item pt-2 pb-2">
@@ -143,7 +152,7 @@ function fillModalData(data) {
       let formData = new FormData();
       formData.append("id", data.id);
 
-      let avatarInput = document.getElementById("avatar-input");
+      let avatarInput = document.getElementById("avatar-inputA");
       if (avatarInput.files.length > 0) {
           formData.append("avatar", avatarInput.files[0]);
       }
@@ -426,11 +435,12 @@ document.addEventListener("DOMContentLoaded", function () {
 		function searchStories() {
 		    const title = titleInput.value.trim();
 			const author = authorInput.value.trim();
+			console.log("author:",author);
 		    let queryParams = [];
 		    if (title) queryParams.push(`title=${encodeURIComponent(title)}`);
-		    if (author) queryParams.push(`authors=${encodeURIComponent(author)}`);
+		    if (author) queryParams.push(`author=${encodeURIComponent(author)}`);
 		    let queryString = queryParams.length ? `?${queryParams.join("&")}` : "";
-
+			console.log("query",queryString);
 		    fetch(`/admin/search-story${queryString}`)
 		        .then(response => response.json())
 		        .then(stories => {
@@ -551,8 +561,8 @@ document.addEventListener("DOMContentLoaded", function () {
                        <div class="col-5 justify-content-center">
                            <a href="#" class="d-inline-block text-truncate"
                                data-bs-toggle="tooltip" data-bs-placement="bottom"
-                               title="${report.content}">
-                               ${report.content}
+                               title="${report.report_content}">
+                               ${report.report_content}
                            </a>
                        </div>`;
 

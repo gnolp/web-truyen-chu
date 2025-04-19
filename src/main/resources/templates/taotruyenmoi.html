@@ -530,60 +530,58 @@
 		}
 
 		function createStory() {
-			// Lấy tên truyện
-			const title = document.getElementById("storyTitle").value;
+    // Lấy tên truyện
+    const title = document.getElementById("storyTitle").value;
 
-			// Lấy mô tả
-			const description = document.getElementById("storyDescription").value;
+    // Lấy mô tả
+    const description = document.getElementById("storyDescription").value;
 
-			// Lấy thể loại đã chọn
-			const selectedGenres = [];
-			const checkboxes = document.querySelectorAll("#genreList input[type='checkbox']");
-			checkboxes.forEach((checkbox) => {
-				if (checkbox.checked) {
-					selectedGenres.push(checkbox.value);
-				}
-			});
+    // Lấy thể loại đã chọn
+    const selectedGenres = [];
+    const checkboxes = document.querySelectorAll("#genreList input[type='checkbox']");
+    checkboxes.forEach((checkbox) => {
+        if (checkbox.checked) {
+            selectedGenres.push(checkbox.value);
+        }
+    });
 
-			// Lấy hình ảnh (nếu người dùng đã tải lên ảnh mới)
-			const img = document.getElementById("uploadedImage");
-			const imageSrc = img.src.startsWith("data:") ? img.src : "/images/logo.png";  // Sửa lỗi này
+    // Lấy hình ảnh từ input file
+    const fileInput = document.getElementById("storyImage");
+    const file = fileInput.files[0]; // Lấy file đầu tiên
 
-			// Lấy author_id từ Thymeleaf hoặc từ một giá trị JavaScript đã có sẵn
-			const author_id = [[${ session.userId }]];
+    // Lấy author_id từ Thymeleaf hoặc một biến JavaScript có sẵn
+    const author_id = [[${ session.userId }]];
 
-			// Tạo đối tượng dữ liệu để gửi về backend
-			const data1 = {
-				title: title,
-				genres: selectedGenres.join(", "), // Ghép các thể loại thành chuỗi
-				description: description,
-				image: imageSrc,
-				author_id: author_id,
-			};
+    // Tạo đối tượng FormData để gửi dữ liệu
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("genres", selectedGenres.join(", ")); // Ghép chuỗi thể loại
+    formData.append("description", description);
+    formData.append("author_id", author_id);
 
-			console.log("data1: ", data1);  // In ra để kiểm tra dữ liệu
+    if (file) {
+        formData.append("image", file); // Thêm file ảnh vào FormData nếu có
+    }
 
-			// Gửi dữ liệu tới backend bằng fetch API
-			fetch("/tao-truyen", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(data1),
-			})
-				.then((response) => response.text())
-				.then((result) => {
-					if (result === "true") {
-						alert("Đã tạo thành công!");
-					} else {
-						alert("Có lỗi xảy ra!");
-					}
-				})
-				.catch((error) => {
-					console.error("Lỗi khi gửi yêu cầu:", error);
-					alert("Không thể lưu thay đổi. Vui lòng thử lại!");
-				});
-		}
+    // Gửi dữ liệu tới backend bằng fetch API
+    fetch("/tao-truyen", {
+        method: "POST",
+        body: formData, // Không cần `Content-Type`, trình duyệt sẽ tự động thêm
+    })
+    .then((response) => response.text())
+    .then((result) => {
+        if (result === "true") {
+            alert("Đã tạo thành công!");
+        } else {
+            alert("Có lỗi xảy ra!");
+        }
+    })
+    .catch((error) => {
+        console.error("Lỗi khi gửi yêu cầu:", error);
+        alert("Không thể lưu thay đổi. Vui lòng thử lại!");
+    });
+}
+
 
 		function cancel() {
 			if (confirm("Bạn có chắc chắn muốn hủy không?")) {

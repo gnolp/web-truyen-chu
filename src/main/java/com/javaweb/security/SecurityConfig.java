@@ -14,9 +14,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
-                .anyRequest().permitAll() // Cho phép tất cả các request không cần xác thực
+                .anyRequest().permitAll() 
             .and()
-            .csrf().disable(); // Tắt CSRF nếu bạn không sử dụng các form POST/PUT/DELETE
+            .csrf().disable(); 
         return http.build();
     }
     

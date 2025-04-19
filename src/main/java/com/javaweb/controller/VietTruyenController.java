@@ -11,6 +11,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -20,22 +21,38 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.javaweb.bean.Chapter;
 import com.javaweb.bean.User;
 import com.javaweb.repository.BookInformation;
 import com.javaweb.repository.ChapterInformation;
+import com.javaweb.service.CloudinaryService;
 
 @Controller
 public class VietTruyenController {
+	private final CloudinaryService cloudinaryService;
+    @Autowired
+    public VietTruyenController(CloudinaryService cloudinaryService) {
+        this.cloudinaryService = cloudinaryService;
+    }
+	@GetMapping("/chapter")
+	public static String getChapter() {
+		return "chapter";
+	}
 	@GetMapping("/dangtruyen")
 	public static String vietTruyen(HttpSession session) {
 		User user = (User) session.getAttribute("user");
 		if(user != null)
 			return "vt";
 		return "loginPlease";
+	}
+	@GetMapping("/story-details")
+	public static String getTruyen(){
+		return "story-details";
 	}
 	
 	@GetMapping("/them-truyen")
@@ -52,54 +69,32 @@ public class VietTruyenController {
 			return "chinhsuatruyen";
 		return "loginPlease";
 	}
-	private String BASE_UPLOAD_DIR = "F:\\gt\\Jav\\test\\src\\main\\resources\\uploads\\user";
 	@ResponseBody
 	@PostMapping("/tao-truyen")
-	public boolean taoTruyenMoi(@RequestBody Map<String, Object> story) throws FileNotFoundException {
-	    // Giải mã các trường dữ liệu từ request body
-	    String title = (String) story.get("title");
-	    String genres = (String) story.get("genres");
-	    String description = (String) story.get("description");
-	    String image = (String) story.get("image");
-	    int authorId = (int) story.get("author_id");
-	    String imageSrc = null;
-	    String tloai[] = genres.split(", ");
+	public boolean taoTruyenMoi(
+	        @RequestParam("title") String title,
+	        @RequestParam("genres") String genres,
+	        @RequestParam("description") String description,
+	        @RequestParam(value = "image", required = false) MultipartFile image,
+	        @RequestParam("author_id") int authorId) throws IOException {
+
+		String imageSrc = "";
+	    String[] tloai = genres.split(", ");
+
+	    // Tạo truyện mới trong database (chưa có ảnh)
 	    int storyId = BookInformation.generate(title, tloai, description, imageSrc, authorId);
-	    if (image != null && image.contains("data:image")) {
-	        try {
-	            
-	            String base64Image = image.split("base64,")[1];
-	            byte[] imageBytes = Base64.getDecoder().decode(base64Image);
 
+	    if (image != null && !image.isEmpty()) {
+	        
+	            imageSrc = cloudinaryService.uploadFile(image);
 	            
-	            String uploadDirPath = BASE_UPLOAD_DIR + File.separator + "id" + authorId + File.separator + "stories";
-	            File uploadDir = new File(uploadDirPath);
-
-	            
-	            if (!uploadDir.exists()) {
-	                uploadDir.mkdirs();
-	            }
-	            String fileName = "truyen"+storyId + ".jpg";
-	            File outputFile = new File(uploadDir, fileName);
-
-	            
-	            try (FileOutputStream fileOutputStream = new FileOutputStream(outputFile)) {
-	                fileOutputStream.write(imageBytes);
-	            }
-	            imageSrc = "/uploads/user/id" + authorId + "/stories/" + fileName;
-	        } catch (IOException e) {
-	            e.printStackTrace(); 
-	            return false;
-	        }
-	    } else {
-	    	imageSrc = image;
+	        
 	    }
-	    
-	    System.out.println(title+" " + genres + " "+ description+ "  "+ imageSrc+" "+authorId+" "+ storyId);
+
+	
 	    BookInformation.updateImageSrc(storyId, imageSrc);
-	    if(storyId > 0 )
-	    	return true;
-	    return false;
+
+	    return storyId > 0;
 	}
 	@DeleteMapping("delete-chapter/{id}")
     public ResponseEntity<String> deleteChapter(@PathVariable int id) throws SQLException {
