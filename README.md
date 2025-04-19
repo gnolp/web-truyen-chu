@@ -2,7 +2,8 @@
 
 Web truyện chữ là một project đơn giản sử dụng java, spring, jdcb, mssql. project có những chức năng cơ bản như đăng nhập, đăng kí, chỉnh sửa trang cá nhân, đăng truyện, đọc truyện, tìm kiếm truyện theo tên. project được tạo để nhằm mục đích luyện tập, nên có nhiều thiếu sót, và cấu trúc thư mục chưa được tối ưu.
 
-##Demo
+## Demo
+
 ### User
 ![image](https://github.com/user-attachments/assets/36049a49-7829-41ba-bd93-1216586970de)
 ![image](https://github.com/user-attachments/assets/ef480777-9358-4c0c-8748-579f82a8267a)
