@@ -12,7 +12,7 @@ public class ConnectionDB {
             + "databaseName=auth;"
             + "encrypt=false;";
     private static String USER_NAME = "long";
-    private static String PASSWORD = "Password123#";
+    private static String PASSWORD = "123456789";
     protected static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL, USER_NAME, PASSWORD);
     }

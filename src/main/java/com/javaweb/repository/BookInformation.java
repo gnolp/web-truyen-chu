@@ -10,6 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 import com.javaweb.bean.Book;
 import com.javaweb.bean.Category;
 import com.javaweb.bean.Chapter;
@@ -39,7 +42,7 @@ public class BookInformation {
 	public static List<Book> getstories (long userId) throws SQLException{
 		List<Book> a = new ArrayList<>();
 		
-		String sql = "select title,id,srcA from [book] where author_id =?";
+		String sql = "select title,id,srcA,so_chuong from [book] where author_id =?";
 		try(Connection conn = ConnectionDB.getConnection();
 				PreparedStatement stmt = conn.prepareStatement(sql)){
 			stmt.setLong(1,userId);
@@ -55,9 +58,7 @@ public class BookInformation {
 				//x.setUpdated_at(rs.getDate("updated_at"));
 				x.setSrcA(rs.getString("srcA") != null ? rs.getString("srcA"):null);
 				
-				List<Chapter> so_chuong = ChapterInformation.getChaptersByBookId(x.getId());
-				x.setSo_chuong(so_chuong.size());
-				
+				x.setSo_chuong(rs.getInt("so_chuong"));
 				System.out.println(x);
 				a.add(x);
 			}
@@ -154,36 +155,48 @@ public class BookInformation {
 		}
 		return book;
 	}
-	public static List<Book> getBookByIdOfKind(int id) throws SQLException{
+	public static List<Book> getBookByIdOfKind(int id, int page) throws SQLException{
+		int size = 1;
+		int offset = (page-1)*size;
 		List<Book> books = new ArrayList<>();
 		String sql = "SELECT b.id, b.title,b.srcA,b.status\r\n"
 				+ "FROM book b\r\n"
 				+ "JOIN book_category bc ON b.id = bc.book_id\r\n"
 				+ "JOIN category c ON c.id = bc.category_id\r\n"
-				+ "WHERE c.id = ?;";
+			
+				+ "WHERE c.id = ? \r\n"
+				+ "ORDER BY b.luot_doc \r\n"
+				+ "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 		try(Connection conn = ConnectionDB.getConnection();
 				PreparedStatement stmt = conn.prepareStatement(sql)){
 			stmt.setInt(1, id);
+			stmt.setInt(2, offset);
+			stmt.setInt(3, size);
 			ResultSet rs = stmt.executeQuery();
 			while(rs.next()) {
 				Book book = new Book();
 				book.setStatus(rs.getString("status"));
-				//book.setAuthor_id(rs.getLong("author_id"));
-				//book.setCreated_at(rs.getDate("created_at"));
 				book.setId(rs.getInt("id"));
-				//book.setLuotdoc(rs.getInt("luot_doc"));
-				//book.setMo_ta(rs.getString("mo_ta"));
-				//book.setSo_chuong(rs.getInt("so_chuong"));
 				book.setTitle(rs.getString("title"));
 				book.setSrcA(rs.getString("srcA") != null ? rs.getString("srcA"):null);
-				//book.setUpdated_at(rs.getDate("updated_at"));
 				books.add(book);
 			}
 			return books;
 		}
 		
 	}
-	
+	public static int countBookByCategory(int categoryId) throws SQLException {
+		String sql = "SELECT COUNT(*) FROM book_category WHERE category_id = ?";
+		try (Connection conn = ConnectionDB.getConnection();
+			 PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setInt(1, categoryId);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()) {
+				return rs.getInt(1);
+			}
+		}
+		return 0;
+	}
 	public static List<Book> getTruyenHot() throws SQLException{
 		List<Book> books = new ArrayList<>();
 		String sql = "SELECT TOP 10 book.srcA,book.id,book.title,book.status\r\n"
@@ -310,11 +323,22 @@ public class BookInformation {
 
 	        
 	        try (PreparedStatement updateStmt = conn.prepareStatement(updateBookSql.toString())) {
-	            updateStmt.setString(1, title);
-	            updateStmt.setString(2, description);
-	            updateStmt.setString(3, imageSrc);
-	            updateStmt.setString(4,status);
-	            updateStmt.setInt(5, book_id);
+	        	int index = 1;
+	        	if (title != null && !title.isEmpty()) {
+	        	    updateStmt.setString(index++, title);
+	        	}
+	        	if (description != null && !description.isEmpty()) {
+	        	    updateStmt.setString(index++, description);
+	        	}
+	        	if (imageSrc != null && !imageSrc.isEmpty()) {
+	        	    updateStmt.setString(index++, imageSrc);
+	        	}
+	        	if (status != null && !status.isEmpty()) {
+	        	    updateStmt.setString(index++, status);
+	        	}
+	        	// Cuối cùng: ID là điều kiện WHERE
+	        	updateStmt.setInt(index, book_id);
+
 	            updateStmt.executeUpdate();
 	        }
 
@@ -417,11 +441,15 @@ public class BookInformation {
 	        e.printStackTrace();
 	    }
 	}
-	public static List<Book> getAllBook() throws SQLException{
+	public static List<Book> getAllBook(int page) throws SQLException{
+		int size = 10;
+		int offset = (page-1)*size;
 		List<Book> books = new ArrayList<>();
-		String sql = "SELECT b.id, b.title, b.srcA, b.status, b.created_at, b.luot_doc, b.so_chuong, a.butdanh AS author_name FROM book b JOIN auth_user a ON b.author_id = a.id;";
+		String sql = "SELECT b.id, b.title, b.srcA, b.status, b.created_at, b.luot_doc, b.so_chuong, a.butdanh AS author_name FROM book b JOIN auth_user a ON b.author_id = a.id ORDER BY id OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
 		try (Connection conn = ConnectionDB.getConnection();
 		         PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setInt(1, offset);
+			stmt.setInt(2, size);
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()) {
                 Book book = new Book();
@@ -598,4 +626,113 @@ public class BookInformation {
         }
         return books;
     }
+
+	public static ResponseEntity<?> addLike(int book_id, int user_id) {
+		String sql = "INSERT INTO liked ( book_id, user_id) VALUES ( ?, ?)";
+		try (Connection conn = ConnectionDB.getConnection();
+	             PreparedStatement stmt = conn.prepareStatement(sql)) {
+				stmt.setInt(1, book_id);
+				stmt.setInt(2, user_id);
+				int affectedRows = stmt.executeUpdate();
+				if(affectedRows<=0) 
+				return ResponseEntity.badRequest().body("Có lỗi vui lòng thử lại");
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	            return ResponseEntity.badRequest().body("Có lỗi vui lòng thử lại");
+	        }
+		return ResponseEntity.ok("đã yêu thích truyện!");
+	}
+
+	public static ResponseEntity<?> getLikedStory(int id, int page) {
+	    int size = 10;
+	    int offset = (page - 1) * size;
+	    List<String> names = new ArrayList<>();
+
+	    String sql = "SELECT b.title " +
+	                 "FROM liked l " +
+	                 "JOIN book b ON b.id = l.book_id " +
+	                 "JOIN auth_user au ON au.id = l.user_id " +
+	                 "WHERE l.user_id = ? " +
+	                 "ORDER BY l.id OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
+
+	    try (Connection conn = ConnectionDB.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+	        stmt.setInt(1, id);
+	        stmt.setInt(2, offset);
+	        stmt.setInt(3, size);
+
+	        ResultSet rs = stmt.executeQuery();
+	        while (rs.next()) {
+	            names.add(rs.getString("title"));
+	        }
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return ResponseEntity.badRequest().body("Có lỗi xảy ra, vui lòng thử lại.");
+	    }
+
+	    return ResponseEntity.ok(names);
+	}
+
+	public static ResponseEntity<?> unlike(int bookId, int userId) {
+	    String sql = "DELETE FROM liked WHERE book_id = ? AND user_id = ?";
+
+	    try (Connection conn = ConnectionDB.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+	        
+	        stmt.setInt(1, bookId);
+	        stmt.setInt(2, userId);
+
+	        
+	        int rowsAffected = stmt.executeUpdate();
+
+	        if (rowsAffected > 0) {
+	            return ResponseEntity.ok("Successfully removed the like.");
+	        } else {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Like not found.");
+	        }
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Có lỗi xảy ra, vui lòng thử lại.");
+	    }
+	}
+
+	public static ResponseEntity<?> countAllBook() {
+	    String sql = "SELECT COUNT(*) FROM book";
+	    int totalBooks = 0;
+
+	    try (Connection conn = ConnectionDB.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+	        ResultSet rs = stmt.executeQuery();
+	        if (rs.next()) {
+	            totalBooks = rs.getInt(1);  
+	        }
+
+	        return ResponseEntity.ok(totalBooks);
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Có lỗi xảy ra, vui lòng thử lại.");
+	    }
+	}
+
+	public static int getNumBer(int book_id) throws SQLException {
+		String sql = "SELECT TOP 1 number FROM chapter WHERE id_book = ? ORDER BY number DESC;";
+		try(Connection conn = ConnectionDB.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)){
+			stmt.setInt(1, book_id);
+			ResultSet rs= stmt.executeQuery();
+			while(rs.next()) {
+				return rs.getInt("number")+1;
+			}
+		}
+		return 1;
+	}
+	
+
+
 }

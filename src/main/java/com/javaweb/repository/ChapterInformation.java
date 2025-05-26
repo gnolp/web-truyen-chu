@@ -78,12 +78,16 @@ public class ChapterInformation {
         return false; 
     }
 	
-	public static List<Chapter> getChaptersByBookId(int idBook) throws SQLException {
+	public static List<Chapter> getChaptersByBookId(int idBook,int page) throws SQLException {
+		int size = 2;
+		int offset = (page-1)*size;
         List<Chapter> chapters = new ArrayList<>();
-        String sql = "SELECT id,title,number FROM chapter WHERE id_book = ? ORDER BY number";
+        String sql = "SELECT id,title,number FROM chapter WHERE id_book = ? ORDER BY number OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
         try(Connection conn = ConnectionDB.getConnection();
 				PreparedStatement stmt = conn.prepareStatement(sql)){
         	stmt.setInt(1, idBook);
+        	stmt.setInt(2, offset);
+        	stmt.setInt(3, size);
         	ResultSet rs = stmt.executeQuery();
         	while (rs.next()) {
                 int id = rs.getInt("id");
@@ -101,15 +105,37 @@ public class ChapterInformation {
         }
 		return chapters;
 	}
-	public static boolean deleteChapterById(int id) throws SQLException {
-		String sql = "Delete from chapter where id = ?";
-		 try(Connection conn = ConnectionDB.getConnection();
-					PreparedStatement stmt = conn.prepareStatement(sql)){
-			 stmt.setInt(1, id);
-			 int rs = stmt.executeUpdate();
-			 return rs > 0;
-		 }
+	public static boolean deleteChapterById(int id, int id_book) throws SQLException {
+	    String sqlDelete = "DELETE FROM chapter WHERE id = ?";
+	    String sqlUpdate = "UPDATE book SET so_chuong = so_chuong - 1 WHERE id = ?";
+	    
+	    try (Connection conn = ConnectionDB.getConnection()) {
+	        conn.setAutoCommit(false);  // Bắt đầu transaction
+
+	        try (PreparedStatement stmtDelete = conn.prepareStatement(sqlDelete)) {
+	            stmtDelete.setInt(1, id);
+	            int rowsAffected = stmtDelete.executeUpdate();
+
+	            if (rowsAffected > 0) {
+	                try (PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)) {
+	                    stmtUpdate.setInt(1, id_book);
+	                    stmtUpdate.executeUpdate();
+	                }
+	                conn.commit();  // Commit khi mọi thứ thành công
+	                return true;
+	            } else {
+	                conn.rollback();  // Rollback nếu không xóa được
+	                return false;
+	            }
+	        } catch (SQLException e) {
+	            conn.rollback();  // Rollback nếu có lỗi
+	            throw e;
+	        } finally {
+	            conn.setAutoCommit(true);  // Khôi phục trạng thái mặc định
+	        }
+	    }
 	}
+
 	public static boolean updateChapter(int idChapter, String title, String content) {
 	    String sql = "UPDATE chapter SET title = ?, content = ? WHERE id = ?"; 
 	    
@@ -225,5 +251,72 @@ public class ChapterInformation {
 	        }
 	    }
 	}
+	
+	public static Chapter readContinue(int chapterid) throws SQLException {
+		String sql = "Select * from chapter where id = ?";
+		try(Connection conn = ConnectionDB.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)){
+			stmt.setInt(1, chapterid);
+			ResultSet rs = stmt.executeQuery();
+			Chapter chapter = new Chapter();
+			while(rs.next()) {
+				chapter.setId(rs.getInt("id"));
+                chapter.setNumber(rs.getInt("number"));
+                chapter.setTitle(rs.getString("title"));
+                chapter.setContent(rs.getString("content"));
+			}
+			return chapter;
+		}
+	}
+	
+	public static Chapter getNextChapter(int storyId, int currentChapterId) throws SQLException {
+    String sql = "SELECT top 1 * FROM chapter " +
+                 "WHERE id_book = ? AND number > (" +
+                 "SELECT number FROM chapter WHERE id = ?" +
+                 ") ORDER BY number ASC";
+
+    try (Connection conn = ConnectionDB.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, storyId);
+        stmt.setInt(2, currentChapterId);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                Chapter chapter = new Chapter();
+                chapter.setId(rs.getInt("id"));
+                chapter.setNumber(rs.getInt("number"));
+                chapter.setTitle(rs.getString("title"));
+                chapter.setContent(rs.getString("content"));
+                return chapter;
+            }
+        }
+    }
+    return null;
+}
+	public static Chapter getPreviousChapter(int storyId, int currentChapterId) throws SQLException {
+	    String sql = "SELECT top 1 * FROM chapter " +
+	                 "WHERE id_book = ? AND number < (" +
+	                 "SELECT number FROM chapter WHERE id = ?" +
+	                 ") ORDER BY number DESC ";
+
+	    try (Connection conn = ConnectionDB.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+	        stmt.setInt(1, storyId);
+	        stmt.setInt(2, currentChapterId);
+
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            if (rs.next()) {
+	                Chapter chapter = new Chapter();
+	                chapter.setId(rs.getInt("id"));
+	                chapter.setNumber(rs.getInt("number"));
+	                chapter.setTitle(rs.getString("title"));
+	                chapter.setContent(rs.getString("content"));
+	                return chapter;
+	            }
+	        }
+	    }
+	    return null;
+	}
+
 
 }

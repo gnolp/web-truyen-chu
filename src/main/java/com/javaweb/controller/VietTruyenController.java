@@ -76,11 +76,14 @@ public class VietTruyenController {
 	        @RequestParam("genres") String genres,
 	        @RequestParam("description") String description,
 	        @RequestParam(value = "image", required = false) MultipartFile image,
-	        @RequestParam("author_id") int authorId) throws IOException {
-
+	        @RequestParam("author_id") int authorId,
+	        HttpSession session) throws IOException {
+		User user = (User) session.getAttribute("user");
+		if(user != null)
+			return false;
 		String imageSrc = "";
 	    String[] tloai = genres.split(", ");
-
+	    
 	    // Tạo truyện mới trong database (chưa có ảnh)
 	    int storyId = BookInformation.generate(title, tloai, description, imageSrc, authorId);
 
@@ -97,8 +100,14 @@ public class VietTruyenController {
 	    return storyId > 0;
 	}
 	@DeleteMapping("delete-chapter/{id}")
-    public ResponseEntity<String> deleteChapter(@PathVariable int id) throws SQLException {
-		boolean isDeleted = ChapterInformation.deleteChapterById(id);
+    public ResponseEntity<String> deleteChapter(@PathVariable int id, @RequestParam int id_book,HttpSession session) throws SQLException {
+		User user = (User) session.getAttribute("user");
+		 if (user == null) {
+		        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please login to continue.");
+		    }
+		boolean isDeleted = ChapterInformation.deleteChapterById(id,id_book);
+		
+
 		if (isDeleted) {
             return ResponseEntity.ok("Chương đã được xóa thành công.");
         } else {
@@ -106,7 +115,10 @@ public class VietTruyenController {
         }
     }
 	@PostMapping("/generate-chapter")
-	public ResponseEntity<String> generateChapter(@RequestBody Map<String, Object> mp) throws SQLException{
+	public ResponseEntity<String> generateChapter(@RequestBody Map<String, Object> mp,HttpSession session) throws SQLException{
+		User user = (User) session.getAttribute("user");
+		if(user == null)
+			return ResponseEntity.badRequest().body("Please Login to continue");
 		String title = (String) mp.get("title");
 		String content = (String) mp.get("content");
 		int number = Integer.parseInt(mp.get("number").toString());
@@ -124,8 +136,10 @@ public class VietTruyenController {
 	@PutMapping("/update-chapter/{id}")
     public ResponseEntity<String> updateChapter(
             @PathVariable("id") int chapterId,
-            @RequestBody Map<String,Object> mp) {
-
+            @RequestBody Map<String,Object> mp,HttpSession session) {
+		User user = (User) session.getAttribute("user");
+		if(user != null)
+			return ResponseEntity.badRequest().body("Please Login to continue");
         // Gọi service để cập nhật chương
         boolean updated = ChapterInformation.updateChapter(chapterId,(String)mp.get("title"),(String)mp.get("content"));
         if (updated) {
@@ -136,8 +150,8 @@ public class VietTruyenController {
     }
 	@ResponseBody
 	@GetMapping("/chapter-of-book/{id}")
-	public List<Chapter> getChapters(@PathVariable int id) throws SQLException{
-		List<Chapter> chapters = ChapterInformation.getChaptersByBookId(id);
+	public List<Chapter> getChapters(@PathVariable int id, @RequestParam int page) throws SQLException{
+		List<Chapter> chapters = ChapterInformation.getChaptersByBookId(id,page);
 		return chapters;
 	}
 	@ResponseBody 

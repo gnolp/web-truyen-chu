@@ -413,6 +413,9 @@
 				<h4>Danh Sách Chương</h4>
 				<!--có một mảng các chương từ backend -->
 			</div>
+			<div class="row">
+				<div id="pagination" class="d-flex justify-content-start mt-5 flex-wrap"></div>
+			</div>
 
 		</div>
 
@@ -470,18 +473,18 @@
 	</div>
 	<script>
 		function escapeHTML(str) {
-			return str.replace(/[&<>"']/g, function (match) {
-				switch (match) {
-					case '&': return '&amp;';
-					case '<': return '&lt;';
-					case '>': return '&gt;';
-					case '"': return '&quot;';
-					case "'": return '&#39;';
-					default: return match;
-				}
-			});
+		    if (typeof str !== "string") return ""; // hoặc return String(str || "")
+		    return str.replace(/[&<>"']/g, function (match) {
+		        const escapeChars = {
+		            '&': '&amp;',
+		            '<': '&lt;',
+		            '>': '&gt;',
+		            '"': '&quot;',
+		            "'": '&#39;'
+		        };
+		        return escapeChars[match];
+		    });
 		}
-
 		function loadDataToDOM(data) {
 			// Lấy thông tin từ JSON
 			const story = data.story;
@@ -540,7 +543,7 @@
 		                    <span id="${chapter.id}" class="chapter-title">
 		                        Chương ${chapter.number}: ${escapedTitle || `Chương ${chapter.number}`}
 		                    </span>
-		                    <button class="btn btn-danger btn-sm" onclick="deleteChapter(${chapter.id})">Xóa</button>
+		                    <button class="btn btn-danger btn-sm" onclick="deleteChapter(${chapter.id},${story.id})">Xóa</button>
 		                    <button class="btn btn-primary btn-sm" onclick="editChapter(${chapter.id}, ${chapter.number})">Chỉnh sửa</button>`;
 						chapterList.appendChild(chapterElement);
 					});
@@ -558,11 +561,18 @@
 			window.location.href = "/dangtruyen";
 		}
 		// Hàm xóa chương
-		function deleteChapter(id) {
-			console.log(`Xóa chương ${id}`);
+		function deleteChapter(id, storyId) {
+			console.log(`Yêu cầu xóa chương ${id}?id_book=${storyId}`);
+
+			// Hiển thị hộp thoại xác nhận
+			const confirmDelete = window.confirm(`Bạn có chắc chắn muốn xóa chương có ID ${id}?`);
+			if (!confirmDelete) {
+				console.log("Hủy xóa chương.");
+				return; // Người dùng không đồng ý → dừng hàm
+			}
 
 			// Gửi yêu cầu DELETE tới backend
-			fetch(`/delete-chapter/${id}`, {
+			fetch(`/delete-chapter/${id}?id_book=${storyId}`, {
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json"
@@ -579,16 +589,18 @@
 
 					let data = JSON.parse(localStorage.getItem("data")) || {};
 					console.log("data", data);
-					// Lọc bỏ chương đã xóa khỏi danh sách chapters
+
+					// Lọc bỏ chương đã xóa khỏi danh sách
 					data.Chuong = data.Chuong.filter((chapter) => chapter.id !== id);
 
 					// Cập nhật lại data trong localStorage
 					localStorage.setItem("data", JSON.stringify(data));
 					console.log("data new :", data);
+
 					// Cập nhật giao diện
 					const chapterElement = document.querySelector(`[id="${id}"]`)?.parentElement;
 					if (chapterElement) {
-						console.log("xóa chương có id:", id);
+						console.log("Đã xóa chương có id:", id);
 						chapterElement.remove();
 					}
 
@@ -717,23 +729,41 @@
 			}
 		}
 
-		function continueWriting() {
-			const data = JSON.parse(localStorage.getItem("data"));
-			console.log("data: ", data);
-			let book_id, number;
-			if (Array.isArray(data.Chuong) && data.Chuong.length > 0) {
-				book_id = data.story.id;  // Lấy id của cuốn sách
-				number = data.Chuong[data.Chuong.length - 1].number + 1;  // Lấy số chương tiếp theo
-				console.log(book_id, number);
+		async function continueWriting() {
+			try {
+				const data = JSON.parse(localStorage.getItem("data"));
+				console.log("data: ", data);
+
+				if (!data || !data.story || !data.story.id) {
+					console.error("Invalid data structure");
+					return;
+				}
+
+				const book_id = data.story.id;
+
+				// Gọi API để lấy thông tin chương tiếp theo
+				const response = await fetch(`/write-continue/${book_id}`);
+				if (!response.ok) {
+					throw new Error("Failed to fetch chapter info");
+				}
+
+				const result = await response.json();
+				console.log("API response: ", result);
+
+				const number = result;
+
+				// Lưu thông tin vào localStorage
+				localStorage.setItem("book_id", book_id);
+				localStorage.setItem("number", number);
+
+				// Chuyển hướng đến trang viết truyện
+				window.location.href = "/dangtruyen";
+			} catch (error) {
+				console.error("Error in continueWriting:", error);
+				alert("Đã xảy ra lỗi khi tiếp tục viết chương. Vui lòng thử lại sau.");
 			}
-			else {
-				book_id = data.story.id;
-				number = 1;
-			}
-			localStorage.setItem("book_id", book_id);
-			localStorage.setItem("number", number);
-			window.location.href = "/dangtruyen";
 		}
+
 
 
 
@@ -770,7 +800,7 @@
 		    formData.append("status", status);
 		    formData.append("author_id", author_id);
 		    formData.append("story_id", story_id);
-
+			
 		    // Nếu có ảnh mới, gửi ảnh; nếu không, gửi link ảnh cũ
 		    if (imageFile) {
 		        formData.append("image", imageFile);
@@ -778,7 +808,10 @@
 		        formData.append("image", data.story.srcA); // Ảnh cũ
 		    }
 
-		    console.log("FormData: ", formData);
+			console.log("FormData content:");
+			for (const [key, value] of formData.entries()) {
+			    console.log(`${key}:`, value);
+			}
 
 		    // Gửi request đến server
 		    fetch("/update-truyen", {

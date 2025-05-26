@@ -21,7 +21,6 @@ import com.javaweb.bean.User;
 import com.javaweb.repository.BookInformation;
 import com.javaweb.repository.ChapterInformation;
 import com.javaweb.repository.UserInformation;
-import com.sun.mail.iap.Response;
 @Controller
 public class AdminController {
 
@@ -33,7 +32,7 @@ public class AdminController {
 			
 			if(user.is_supper() == false) {
 				
-                return "index2";	
+                return "index";	
 			}
 			else {
 				return "admin (2)";
@@ -43,20 +42,45 @@ public class AdminController {
 	}
 	@ResponseBody
 	@GetMapping("/get-users")
-	public List<User> getUsers(){
-		List<User> users = UserInformation.getListUsers();
+	public List<User> getUsers(@RequestParam(name = "page", required = false, defaultValue = "1") int page,HttpSession session){
+		User user = (User) session.getAttribute("user");
+		if(user!=null) {
+			
+			if(user.is_supper() == false) {
+				
+                return null;	
+			}
+		}
+		List<User> users = UserInformation.getListUsers(page);
 		return users;
 	}
 	@ResponseBody
 	@GetMapping("/get-books")
-	public List<Book> getBooks() throws SQLException{
-		List<Book> books = BookInformation.getAllBook();
+	public List<Book> getBooks(@RequestParam(name = "page", required = false, defaultValue = "1") int page,HttpSession session) throws SQLException{
+		User user = (User) session.getAttribute("user");
+		if(user!=null) {
+			
+			if(user.is_supper() == false) {
+				
+                return null;	
+			}
+		}
+		List<Book> books = BookInformation.getAllBook(page);
 		return books;
 	}
 	@DeleteMapping("deleteUser/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable int id) throws SQLException {
-        boolean deleted = UserInformation.deleteUser(id);
+    public ResponseEntity<?> deleteUser(@PathVariable int id,HttpSession session) throws SQLException {
+        
+        User user = (User) session.getAttribute("user");
+		if(user!=null) {
+			
+			if(user.is_supper() == false) {
+				
+                return  ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied");
 
+			}
+		}
+		boolean deleted = UserInformation.deleteUser(id);
         if (deleted) {
             return ResponseEntity.ok("Xóa thành công");
         } else {
@@ -79,7 +103,16 @@ public class AdminController {
 		return ResponseEntity.ok(mp);
 	}
 	@GetMapping("/get-data-author")
-	public ResponseEntity<Map<String,Object>> get_author(@RequestParam("author_id") int id ) throws SQLException{
+	public ResponseEntity<?> get_author(@RequestParam("author_id") int id ,HttpSession session) throws SQLException{
+		User user = (User) session.getAttribute("user");
+		if(user!=null) {
+			
+			if(user.is_supper() == false) {
+				
+                return  ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied");
+
+			}
+		}
 		return ResponseEntity.ok(UserInformation.get_author(id));
 	}
 	@GetMapping("admin/search-users")

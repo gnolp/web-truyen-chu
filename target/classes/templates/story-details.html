@@ -60,6 +60,27 @@
       margin-top: 20px;
       gap: 10px; /* Khoảng cách giữa các nút */
     }
+	#pagination {
+	    display: flex;
+	    flex-wrap: wrap;
+	    gap: 10px;
+	    justify-content: center;
+	    max-width: 600px; /* Giới hạn chiều rộng để tự động xuống dòng sau 6 nút */
+	  }
+
+	  #pagination button {
+	    flex: 1 0 15%; /* Mỗi nút chiếm khoảng 15% chiều rộng => ~6 nút mỗi dòng */
+	    min-width: 90px;
+	    max-width: 120px;
+	    white-space: nowrap;
+	    overflow: hidden;
+	    text-overflow: ellipsis;
+	  }
+
+	  .btn.active {
+	    background-color: #0d6efd;
+	    color: white;
+	  }
 	.rating-container {
 	    font-family: Arial, sans-serif;
 	    text-align: center;
@@ -110,6 +131,129 @@
 	    background-color: gold; /* Màu vàng cho phần bị lấp đầy */
 	}
 
+	.comment {
+	      display: flex;
+	      align-items: flex-start;
+	      justify-content: space-between;
+	      padding: 12px;
+	      border: 1px solid #ddd;
+	      border-radius: 8px;
+	      margin-bottom: 12px;
+	      position: relative;
+	      background-color: #fff;
+	    }
+
+	    .comment-left {
+	      display: flex;
+	      gap: 10px;
+	    }
+
+	    .avatar {
+	      width: 40px;
+	      height: 40px;
+	      border-radius: 50%;
+	      background-color: #ccc;
+	      flex-shrink: 0;
+	    }
+
+	    .comment-content {
+	      display: flex;
+	      flex-direction: column;
+	    }
+
+	    .comment-header {
+	      font-weight: bold;
+	    }
+
+	    .comment-time {
+	      font-size: 12px;
+	      color: gray;
+	    }
+
+	    .comment-text {
+	      margin-top: 4px;
+	    }
+
+	    .comment-options {
+	      cursor: pointer;
+	      font-size: 20px;
+	      padding: 4px;
+	      border-radius: 50%;
+	      transition: background-color 0.2s ease;
+	      position: relative;
+	    }
+
+	    .comment-options:hover {
+	      background-color: #eee;
+	    }
+
+	    .dropdown-menu {
+	      position: absolute;
+	      right: 0;
+	      top: 40px;
+	      background-color: white;
+	      border: 1px solid #ccc;
+	      border-radius: 6px;
+	      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+	      display: none;
+	      z-index: 10;
+	    }
+
+	    .dropdown-menu button {
+	      background: none;
+	      border: none;
+	      padding: 8px 16px;
+	      width: 100%;
+	      text-align: left;
+	      cursor: pointer;
+	    }
+
+	    .dropdown-menu button:hover {
+	      background-color: #f0f0f0;
+	    }
+
+	    .edit-area {
+	      margin-top: 6px;
+	      width: 100%;
+	    }
+
+	    .edit-actions {
+	      margin-top: 6px;
+	    }
+
+	    .edit-actions button {
+	      margin-right: 6px;
+	    }
+
+	    .new-comment {
+	      display: flex;
+	      flex-direction: column;
+	      margin-top: 20px;
+	      gap: 8px;
+	    }
+
+	    .new-comment textarea {
+	      width: 100%;
+	      height: 60px;
+	      padding: 8px;
+	      border-radius: 6px;
+	      border: 1px solid #ccc;
+	      resize: vertical;
+	    }
+
+	    .new-comment button {
+	      align-self: flex-end;
+	      padding: 6px 12px;
+	      border: none;
+	      background-color: #1976d2;
+	      color: white;
+	      border-radius: 4px;
+	      cursor: pointer;
+	    }
+
+	    .new-comment button:hover {
+	      background-color: #135ca1;
+	    }
   </style>
   
   <body>
@@ -464,17 +608,267 @@
                 <div id="chapter-list" class="chapter-list-container"></div>
 
                 <!-- Div chứa nút phân trang -->
-                <div class="pagination-controls">
-                  <button id="prevPage" class="btn btn-secondary">
-                    Trang trước
-                  </button>
-                  <span id="pageIndicator"></span>
-                  <button id="nextPage" class="btn btn-secondary">
-                    Trang sau
-                  </button>
-                </div>
+				<div class="row">
+					<div id="pagination" class="d-flex justify-content-start mt-5 flex-wrap"></div>
+				</div>
               </div>
             </div>
+			<div id="comments-container">
+				<button id="load-more-btn" onclick="loadMoreComments()">Hiển thị thêm</button>
+			  <!-- Các comment sẽ ở đây -->
+			</div>
+			<div class="new-comment">
+			  <textarea id="new-comment-content" placeholder="Viết bình luận..."></textarea>
+			  <button onclick="postComment()">Đăng</button>
+			</div>
+			<script>
+			  let currentPageCmt = 1;
+			  const idBook = JSON.parse(localStorage.getItem("data")).story.id;
+			  const currentUser = localStorage.getItem("userId");
+			  console.log("id", idBook);
+			  window.onload = () => {
+			    document.getElementById('new-comment-content').value = "";
+			    loadMoreComments(); // Tải trang đầu
+			  };
+			
+			  async function loadMoreComments() {
+			    try {
+			      const res = await fetch(`/get-comment/${idBook}?page=${currentPageCmt}`);
+			      const data = await res.json();
+			      const comments = data.comments;
+			      console.log(comments);
+
+			      if (comments.length === 0) {
+			        document.getElementById('load-more-btn').disabled = true;
+			        document.getElementById('load-more-btn').textContent = 'Hết bình luận';
+			        return;
+			      }
+
+			      comments.forEach(c => {
+			        renderComment({
+			          id: c.id,
+			          author: c.author,
+			          name: c.author_name,
+			          content: c.content,
+			          time: new Date(c.createAt).toLocaleString('vi-VN'),
+					  canEdit: c.canEdit,
+			        });
+			      });
+
+			      currentPageCmt++;  // Tăng page sau khi load xong
+			    } catch (err) {
+			      console.error("Lỗi khi tải bình luận:", err);
+			    }
+			  }
+
+			
+			  function renderComment({ id, author, name, content, time,canEdit  }) {
+			    const comment = document.createElement('div');
+			    comment.className = 'comment';
+			    comment.dataset.author = author;
+			    comment.dataset.id = id;
+				comment.dataset.canEdit = canEdit;	
+			    comment.innerHTML = `
+			      <div class="comment-left">
+			        <div class="avatar"></div>
+			        <div class="comment-content">
+			          <div class="comment-header">${name}</div>
+			          <div class="comment-time">${time}</div>
+			          <div class="comment-text">${content}</div>
+			        </div>
+			      </div>
+			      <div class="comment-options" onclick="toggleDropdown(this)">&#8942;
+			        <div class="dropdown-menu"></div>
+			      </div>
+			    `;
+			
+			    const container = document.getElementById('comments-container');
+			    container.appendChild(comment);
+			  }
+			
+			  async function postComment() {
+			      const content = document.getElementById('new-comment-content').value.trim();
+			      if (!content) return;
+
+			      const payload = { content };
+
+			      console.log("content:", content);
+
+			      try {
+			          const res = await fetch(`/comment?book_id=${idBook}`, {
+			              method: 'POST',
+			              headers: { 'Content-Type': 'application/json' },
+			              body: JSON.stringify(payload)
+			          });
+			          const result = await res.json();
+
+			          if (res.ok) {
+			              const comment = result.comment;
+			              renderComment({
+			                  id: comment.id,
+			                  author: comment.author,
+			                  name: comment.author_name || comment.name || "Ẩn danh",
+			                  content: comment.content,
+			                  time: new Date(comment.createAt || Date.now()).toLocaleString('vi-VN'),
+							  canEdit: comment.canEdit,
+			              });
+			              document.getElementById('new-comment-content').value = "";
+			          } else {
+			              alert(result.message || "Lỗi khi đăng bình luận.");
+			          }
+			      } catch (err) {
+			          console.error("Lỗi gửi bình luận:", err);
+			      }
+			  }
+
+			
+			  function editComment(btn) {
+				  const comment = btn.closest('.comment');
+				  const canEdit = comment.dataset.canEdit === 'true';
+				  if (!canEdit) {
+				    alert("Bạn không có quyền sửa bình luận này.");
+				    return;
+				  }
+				
+				  const textEl = comment.querySelector('.comment-text');
+				  const oldText = textEl.textContent;
+				
+				  const textarea = document.createElement('textarea');
+				  textarea.value = oldText;
+				  textarea.className = 'edit-area';
+				  textEl.replaceWith(textarea);
+				
+				  const actions = document.createElement('div');
+				  actions.className = 'edit-actions';
+				  actions.innerHTML = `
+				    <button onclick="saveEdit(this)">Lưu</button>
+				    <button onclick="cancelEdit(this)">Hủy</button>
+				  `;
+				
+				  textarea.after(actions);
+				  btn.closest('.dropdown-menu').style.display = 'none';
+				}
+
+			
+			  async function saveEdit(btn) {
+				  const comment = btn.closest('.comment');
+				  const textarea = comment.querySelector('textarea');
+				  const newText = textarea.value.trim();
+				  const commentId = comment.dataset.id;
+				
+				  if (!newText) {
+				    alert("Nội dung bình luận không được để trống.");
+				    return;
+				  }
+				
+				  try {
+				    const res = await fetch(`/edit-comment/${commentId}`, {
+				      method: 'PUT',
+				      headers: { 'Content-Type': 'application/json' },
+				      body: JSON.stringify({ content: newText })
+				    });
+				
+				    if (!res.ok) {
+				      const errData = await res.json().catch(() => ({}));
+				      alert(errData.message || "Không thể lưu chỉnh sửa.");
+				      return;
+				    }
+				
+				    const textEl = document.createElement('div');
+				    textEl.className = 'comment-text';
+				    textEl.textContent = newText;
+				
+				    // Xoá nút Lưu, Hủy
+				    const actions = textarea.nextElementSibling;
+				    if (actions) actions.remove();
+				
+				    textarea.replaceWith(textEl);
+				  } catch (err) {
+				    console.error("Lỗi khi lưu chỉnh sửa:", err);
+				    alert("Có lỗi xảy ra khi lưu bình luận.");
+				  }
+				}
+			
+			  function cancelEdit(btn) {
+			    const comment = btn.closest('.comment');
+			    const textarea = comment.querySelector('textarea');
+			    const oldText = textarea.defaultValue;
+			
+			    const textEl = document.createElement('div');
+			    textEl.className = 'comment-text';
+			    textEl.textContent = oldText;
+			
+			    textarea.nextElementSibling.remove();
+			    textarea.replaceWith(textEl);
+			  }
+			
+			  function toggleDropdown(el) {
+			    const comment = el.closest('.comment');
+			    const menu = el.querySelector('.dropdown-menu');
+
+			    // Lấy giá trị canEdit từ data attribute, chuyển sang boolean
+			    const canEdit = comment.dataset.canEdit === 'true';
+
+			    if (menu.style.display === "block") {
+			      menu.style.display = "none";
+			    } else {
+			      menu.innerHTML = "";
+
+			      if (canEdit) {
+			        menu.innerHTML += "<button onclick='editComment(this)'>Chỉnh sửa</button>";
+			        menu.innerHTML += "<button onclick='deleteComment(this)'>Xóa</button>";
+			      } else {
+			        menu.innerHTML += "<button onclick='hideComment(this)'>Ẩn</button>";
+			      }
+
+			      menu.style.display = "block";
+			    }
+			  }
+			
+			  async function deleteComment(btn) {
+			    const comment = btn.closest('.comment');
+			    const commentId = comment.dataset.id;
+
+			    const confirmDelete = confirm("Bạn có chắc muốn xoá bình luận này?");
+			    if (!confirmDelete) return;
+
+			    try {
+			      const res = await fetch(`/delete-comment/${commentId}`, {
+			        method: 'DELETE'
+			      });
+
+			      const data = await res.json();
+
+			      if (res.ok) {
+			        comment.remove(); // Xoá khỏi DOM
+			        alert(data.message || "Đã xoá bình luận.");
+			      } else {
+			        alert(data.message || "Không có quyền xoá bình luận.");
+			      }
+			    } catch (err) {
+			      console.error("Lỗi khi xoá bình luận:", err);
+			      alert("Có lỗi xảy ra khi xoá bình luận.");
+			    }
+			  }
+
+			
+			  function hideComment(btn) {
+				const comment = btn.closest('.comment');
+				comment.remove();
+			    alert("Bình luận đã bị ẩn khỏi bạn.");
+			  }
+			
+			  // Đóng dropdown khi click ngoài
+			  document.addEventListener('click', function (event) {
+			    const isDropdown = event.target.closest('.comment-options');
+			    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+			      if (!isDropdown || !isDropdown.contains(menu)) {
+			        menu.style.display = 'none';
+			      }
+			    });
+			  });
+			</script>
+
           </div>
 
           <div class="col-12 col-md-5 col-lg-4 sticky-md-top">
@@ -916,16 +1310,6 @@
       </div>
     </div>
     <script>
-		document.addEventListener("DOMContentLoaded", function () {
-		    //fetch("/api/get-rating")
-		    //   .then(response => response.json())
-		    //    .then(data => {
-		    //        updateRatingUI(data.rating, data.votes, data.partial_star);
-		    //    })
-		    //    .catch(error => console.error("Lỗi khi tải rating:", error));
-			updateRatingUI(8.5, 1000)
-		});
-
 		function updateRatingUI(rating, votes) {
 		    const stars = document.querySelectorAll(".star");
 		    document.getElementById("rating-score").textContent = rating.toFixed(1);
@@ -945,7 +1329,153 @@
 		            star.style.setProperty("--partial-width", `${partialStar * 100}%`);
 		        }
 		    });
-		}		
+		}
+		function displayStoryData(data) {
+		  const authorId = data.story.author_id;
+		  
+		  document.getElementById("story-title").textContent = data.story.title;
+		  document.getElementById("authorName").textContent = data["bút danh"];
+		  localStorage.setItem("authorId", authorId);
+		  document.getElementById(
+		    "authorName"
+		  ).href = `/account?userId=${authorId}`;
+		  document.getElementById("img-fluid-img").src = data.story.srcA;
+		  document.getElementById("text-info-status").textContent =
+		    data.story.status;
+		  document.getElementById("theloai").textContent = data.theloai;
+		  // Điền thông tin mô tả
+		  document.getElementById("story-review").textContent = data.story.mo_ta;
+
+		  localStorage.setItem("story-name", data.story.title);
+		  localStorage.setItem("story-id", data.story.id);
+		}
+		let currentPage = 1;
+		const chaptersPerPage = 2;
+
+		async function fetchChapters(page) {
+		  const storyId = localStorage.getItem("story-id");
+		  if (!storyId) {
+		    console.error("Không tìm thấy story-id trong localStorage");
+		    return;
+		  }
+
+		  try {
+		    const response = await fetch(`/get-chapter-of-story/${storyId}?page=${page}`);
+		    const chapters = await response.json();
+		    displayChapters(chapters);
+		  } catch (error) {
+		    console.error("Lỗi khi lấy chương:", error);
+		  }
+		}
+
+		function displayChapters(chapters) {
+		  const chapterListDiv = document.getElementById("chapter-list");
+		  chapterListDiv.innerHTML = "";
+
+		  const column1 = document.createElement("div");
+		  const column2 = document.createElement("div");
+		  column1.classList.add("column");
+		  column2.classList.add("column");
+
+		  chapters.forEach((chapter, index) => {
+		    const chapterDiv = document.createElement("div");
+		    chapterDiv.textContent = `Chương ${chapter.number}: ${chapter.title}`;
+		    chapterDiv.classList.add("chapter-item");
+		    chapterDiv.style.cursor = "pointer";
+
+		    chapterDiv.addEventListener("click", async function () {
+		      const response = await fetch(`/get/content/${chapter.id}`);
+		      const data_content = await response.json();
+		      const chapterData = {
+		        number: chapter.number,
+		        title: chapter.title,
+		        content: data_content.content,
+		        id: chapter.id,
+		      };
+		      const viewsLog = {
+		        bookId: localStorage.getItem("story-id"),
+		        chapterId: chapter.id,
+		      };
+		      fetch("/increase-views", {
+		        method: "PATCH",
+		        headers: { "Content-Type": "application/json" },
+		        body: JSON.stringify(viewsLog),
+		      }).catch(error => console.error("Lỗi cập nhật lượt xem:", error));
+
+		      localStorage.setItem("selectedChapter", JSON.stringify(chapterData));
+		      window.location.href = "/chapter";
+		    });
+
+		    if (index < chapters.length / 2) {
+		      column1.appendChild(chapterDiv);
+		    } else {
+		      column2.appendChild(chapterDiv);
+		    }
+		  });
+
+		  chapterListDiv.appendChild(column1);
+		  chapterListDiv.appendChild(column2);
+		}
+
+		function setupPaginationButtons(so_chuong) {
+		  const paginationDiv = document.getElementById("pagination");
+		  paginationDiv.innerHTML = "";
+
+		  const totalPages = Math.ceil(so_chuong / chaptersPerPage);
+
+		  for (let i = 1; i <= totalPages; i++) {
+		    const start = (i - 1) * chaptersPerPage + 1;
+		    const end = Math.min(i * chaptersPerPage, so_chuong);
+
+		    const button = document.createElement("button");
+		    button.textContent = `Chương ${start}–${end}`;
+		    button.classList.add("btn", "btn-outline-primary", "m-1");
+
+		    if (i === currentPage) button.classList.add("active");
+
+		    button.addEventListener("click", () => {
+		      currentPage = i;
+		      fetchChapters(currentPage);
+		      highlightActiveRange(i);
+		    });
+
+		    paginationDiv.appendChild(button);
+		  }
+		}
+
+		function highlightActiveRange(activePage) {
+		  const buttons = document.querySelectorAll("#pagination button");
+		  buttons.forEach((btn, idx) => {
+		    if (idx === activePage - 1) {
+		      btn.classList.add("active");
+		    } else {
+		      btn.classList.remove("active");
+		    }
+		  });
+		}
+
+		// Gọi khi DOM đã load
+		document.addEventListener("DOMContentLoaded", function () {
+				    //fetch("/api/get-rating")
+				    //   .then(response => response.json())
+				    //    .then(data => {
+				    //        updateRatingUI(data.rating, data.votes, data.partial_star);
+				    //    })
+				    //    .catch(error => console.error("Lỗi khi tải rating:", error));
+					updateRatingUI(8.5, 1000);
+					const data = JSON.parse(localStorage.getItem("data"));
+						if (data) {
+							displayStoryData(data);
+					}
+					const soChuong = parseInt(data.story.so_chuong);
+					if (!soChuong || isNaN(soChuong)) {
+					    console.error("Không tìm thấy số chương trong localStorage");
+					    return;
+					}
+					setupPaginationButtons(soChuong);
+					fetchChapters(currentPage);
+				});
+
 		</script>
 		
     <script src="/jquery.min.js"></script>

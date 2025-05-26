@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -57,20 +58,31 @@ public class AccountController {
    
    
 
-        @GetMapping("/stories-of-user")
-        public ResponseEntity<List<Book>> getUserStories(@RequestParam("userId") long userId) throws SQLException {
-            
+        @GetMapping("/stories-of-user/{userId}")
+        public ResponseEntity<?> getUserStories(HttpSession session, @PathVariable int userId) throws SQLException {
+        	User user = (User) session.getAttribute("user");
+    		if(user != null && user.getId() == userId)
+//    			return ResponseEntity
+//    	                .status(HttpStatus.FORBIDDEN).body("Vui lòng đăng nhập để tiếp tục!");
+    			userId = user.getId();
         	List<Book> stories = BookInformation.getstories(userId);
         	return ResponseEntity.ok(stories);
         }
 
         @GetMapping("/bookshelf-of-user")
-        public ResponseEntity<List<Map<String, Object>>> getUserBookshelf(@RequestParam("userId") long userId) throws SQLException {
-        	List<Map<String, Object>> stories = BookInformation.getBookShelf(userId);
+        public ResponseEntity<?> getUserBookshelf(HttpSession session) throws SQLException {
+        	User user = (User) session.getAttribute("user");
+    		if(user == null)
+    			return ResponseEntity
+    	                .status(HttpStatus.FORBIDDEN).body("Vui lòng đăng nhập để tiếp tục!");
+        	List<Map<String, Object>> stories = BookInformation.getBookShelf(user.getId());
         	return ResponseEntity.ok(stories);
         }
 
-
+        @GetMapping("/count-user")
+        public ResponseEntity<?> countAllUser(){
+        	return UserInformation.countAllUser();
+        }
 
         @PostMapping("/update")
         public ResponseEntity<String> updateProfile(
@@ -113,9 +125,13 @@ public class AccountController {
             }
         }
         @PostMapping("/add-to-bookshelve")
-        public ResponseEntity<String> addToBookshelve(@RequestBody Map<String,Object> mp) throws SQLException{
-        	int userId = Integer.parseInt(mp.get("userId").toString());
-        	int chapterId = Integer.parseInt(mp.get("chapterId").toString());
+        public ResponseEntity<String> addToBookshelve(@RequestBody Map<String,Object> mp, HttpSession session) throws SQLException{
+        	User user = (User) session.getAttribute("user");
+    		if(user == null)
+    			return ResponseEntity.badRequest().body("Vui lòng đăng nhập để tiếp tục!");
+        	//int userId = Integer.parseInt(mp.get("userId").toString());
+    		int userId = user.getId();
+    		int chapterId = Integer.parseInt(mp.get("chapterId").toString());
         	int bookId = Integer.parseInt(mp.get("bookId").toString());
         	System.out.println(chapterId + " " + bookId);
         	boolean up = ChapterInformation.addToBookshelves(userId, chapterId, bookId);

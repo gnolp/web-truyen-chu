@@ -73,7 +73,7 @@ function showAuth(list, authors) {
 
         tr.innerHTML = `
             <td id="id_authors">${au.id}</td>
-            <td><img src="${au.srcA}" style="width: 65px;"></td>
+            <td><img src="${au.srcA}" style="width: 65px; height: 60px"></td>
             <td>${au.name}</td>
             <td>${au.butdanh}</td>
             <td>${au.created_at}</td>
@@ -577,7 +577,7 @@ document.addEventListener("DOMContentLoaded", function () {
                        console.log("📖 Chương được chọn có ID:", chapterId);
 
                        try {
-                           const response = await fetch(`/get-chapter/${chapterId}`);
+                           const response = await fetch(`/continue-read/${chapterId}`);
                            const chapter = await response.json();
 
                            const chapterData = {

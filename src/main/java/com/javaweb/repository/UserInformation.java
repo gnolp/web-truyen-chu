@@ -10,6 +10,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 public class UserInformation {
 
 	public static boolean checkLogin(String username, String password) {
@@ -123,11 +128,15 @@ public class UserInformation {
 	    }
 		return "login";	
 	}
-	public static List<User> getListUsers(){
+	public static List<User> getListUsers(int page){
+		int size = 10;
+		int offset = (page-1)*size;
 		List<User> list = new ArrayList<>();
-		String sql = "select * from [auth_user]";
+		String sql = "SELECT * FROM [auth_user] ORDER BY id OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 		try(Connection conn = ConnectionDB.getConnection();
 				PreparedStatement stmt = conn.prepareStatement(sql)){
+				stmt.setInt(1, offset);
+				stmt.setInt(2, size);
 				ResultSet rs = stmt.executeQuery();// lưu kết quả query dưới dạng bảng
 				while(rs.next()) { // chuyển đến dòng tiếp thep
 					User a = new User();
@@ -178,6 +187,25 @@ public class UserInformation {
 		}
 		return false;
 	}
+	public static ResponseEntity<?> countAllUser() {
+	    String sql = "SELECT COUNT(*) FROM auth_user";
+	    int totalUsers = 0;
+
+	    try (Connection conn = ConnectionDB.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+	        ResultSet rs = stmt.executeQuery();
+	        if (rs.next()) {
+	        	totalUsers = rs.getInt(1);  
+	        }
+
+	        return ResponseEntity.ok(totalUsers);
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Có lỗi xảy ra, vui lòng thử lại.");
+	    }
+	} 
 	public static boolean updateUserInformation(User a) {
 	    StringBuilder sql = new StringBuilder("UPDATE [auth_user] SET ");
 	    List<Object> params = new ArrayList<>();

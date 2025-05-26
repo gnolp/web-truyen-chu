@@ -871,7 +871,7 @@
 		function deleteFromBookshelf(storyId) {
 			console.log("ấn nút xóa khỏi tủ sách");
 			if (confirm('Bạn có chắc chắn muốn xóa truyện này?')) {
-				fetch(`/delete-story-from-bookshelf/${storyId}/${userId}`, {
+				fetch(`/delete-story-from-bookshelf/${storyId}`, {
 					method: 'DELETE',
 					headers: {
 						'Content-Type': 'application/json'
@@ -975,10 +975,14 @@
 
 		async function loadStories() {
 			try {
-				const response = await fetch(`/stories-of-user?userId=${userId}`);
+				const response = await fetch(`/stories-of-user/${userId}`);
 				console.log("userid:", userId);
-				storiesData = await response.json();
-
+				if(response.ok)
+					storiesData = await response.json();
+				else{
+					alert("vui lòng đăng nhập!");
+					return;
+				}
 				const storyListElement = document.querySelector('.story-list');
 				storyListElement.innerHTML = '';
 				console.log("data", storyListElement);
@@ -1136,7 +1140,7 @@
 					const currentChapter = story.chapters || 1;
 					const chapterId = readMoreButton.dataset.chapterId;
 					console.log("chuong hien tai co id:", chapterId);
-					const response = await fetch(`/get-chapter/${chapterId}`);
+					const response = await fetch(`/continue-read/${chapterId}`);
 					const chapter = await response.json();
 					const chapterData = {
 						number: chapter.number,
@@ -1185,8 +1189,13 @@
 
 		async function loadBookshelf() {
 			try {
-				const response = await fetch(`/bookshelf-of-user?userId=${userId}`);
-				storiesData = await response.json();
+				const response = await fetch(`/bookshelf-of-user`);
+				if(response.ok)
+					storiesData = await response.json();
+				else{
+					alert("Vui lòng đăng nhập để tiếp tục!");
+					return;
+				}
 				console.log("truyen", storiesData);
 				const bookListElement = document.querySelector('.bookshelf-list');
 				bookListElement.innerHTML = '';

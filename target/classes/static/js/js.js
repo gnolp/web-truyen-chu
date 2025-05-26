@@ -1,143 +1,4 @@
 
-
-document.addEventListener("DOMContentLoaded", () => {
-  const data = JSON.parse(localStorage.getItem("data"));
-
-  if (data) {
-    displayStoryData(data);
-    displayChapters(data);
-  }
-});
-function displayStoryData(data) {
-  const authorId = data.story.author_id;
-  
-  document.getElementById("story-title").textContent = data.story.title;
-  document.getElementById("authorName").textContent = data["bút danh"];
-  localStorage.setItem("authorId", authorId);
-  document.getElementById(
-    "authorName"
-  ).href = `/account?userId=${authorId}`;
-  document.getElementById("img-fluid-img").src = data.story.srcA;
-  document.getElementById("text-info-status").textContent =
-    data.story.status;
-  document.getElementById("theloai").textContent = data.theloai;
-  // Điền thông tin mô tả
-  document.getElementById("story-review").textContent = data.story.mo_ta;
-
-  localStorage.setItem("story-name", data.story.title);
-  localStorage.setItem("story-id", data.story.id);
-}
-let currentPage = 1;
-const chaptersPerPage = 25;
-
-function displayChapters(data) {
-  const totalChapters = data.Chuong;
-  console.log("totalChapters:",totalChapters);
-  const chapterListDiv = document.getElementById("chapter-list");
-  chapterListDiv.innerHTML = ""; // Xóa nội dung cũ
-
-  // Tạo hai cột
-  const column1 = document.createElement("div");
-  const column2 = document.createElement("div");
-  column1.classList.add("column");
-  column2.classList.add("column");
-
-  // Lấy chỉ số bắt đầu và kết thúc
-  const startIndex = (currentPage - 1) * chaptersPerPage;
-  const endIndex = Math.min(
-    startIndex + chaptersPerPage,
-    totalChapters.length
-  );
-
-  // Lấy các chương cần hiển thị
-  const chaptersToDisplay = totalChapters.slice(startIndex, endIndex);
-
-  chaptersToDisplay.forEach((chapter, index) => {
-    const chapterDiv = document.createElement("div");
-    chapterDiv.textContent = `Chương ${chapter.number}: ${chapter.title}`;
-    chapterDiv.classList.add("chapter-item");
-    chapterDiv.style.cursor = "pointer";
-
-    // Thêm sự kiện click , lưu chương vào localStorage
-   	chapterDiv.addEventListener("click", async function () {
-      const response = await fetch(`/get/content/${chapter.id}`);
-      const data_content = await response.json();
-      content = data_content.content;
-      const chapterData = {
-        number: chapter.number,
-        title: chapter.title,
-        content: content,
-        id: chapter.id,
-      };
-	  const viewsLog={
-		bookId:data.story.id,
-		chapterId: chapter.id
-	  }
-	  fetch("/increase-views", {
-	          method: "PATCH",
-	          headers: {
-	              "Content-Type": "application/json",
-	          },
-	          body: JSON.stringify(viewsLog)
-	      }).catch(error => console.error("Lỗi cập nhật lượt xem:", error));
-      localStorage.setItem(
-        "selectedChapter",
-        JSON.stringify(chapterData)
-      );
-      localStorage.setItem("allChapters",JSON.stringify(totalChapters));
-      console.log("chapterdata:", chapterData);
-      // Chuyển hướng sang trang chapter.html
-      window.location.href = "/chapter";
-    });
-
-    // Phân chia chương vào 2 cột
-    if (index < 24) {
-      column1.appendChild(chapterDiv);
-    } else {
-      column2.appendChild(chapterDiv);
-    }
-  });
-
-  // Thêm hai cột vào chapterListDiv
-  chapterListDiv.appendChild(column1);
-  chapterListDiv.appendChild(column2);
-
-  // Cập nhật trạng thái của nút phân trang
-  if (totalChapters.length > chaptersPerPage) {
-    updatePagination();
-  }
-}
-
-function updatePagination() {
-  const prevButton = document.getElementById("prevPage");
-  const nextButton = document.getElementById("nextPage");
-  const pageIndicator = document.getElementById("pageIndicator");
-
-  // Cập nhật chỉ thị trang
-  pageIndicator.textContent = `Trang ${currentPage}`;
-
-  // Kích hoạt hoặc vô hiệu hóa nút trước và tiếp theo
-  prevButton.disabled = currentPage === 1;
-  nextButton.disabled =
-    currentPage * chaptersPerPage >= totalChapters.length;
-
-  // Gán sự kiện cho nút trước và tiếp theo
-  prevButton.onclick = () => {
-    if (currentPage > 1) {
-      currentPage--;
-      displayChapters();
-    }
-  };
-
-  nextButton.onclick = () => {
-    if (currentPage * chaptersPerPage < totalChapters.length) {
-      currentPage++;
-      displayChapters();
-    }
-  };
-}
-
-
 //gọi đến api để tìm kiếm tên truyện theo keyword, nếu có truyện thì sẽ showSearchResult() và truyền các truyện tìm được làm tham số.
 document.querySelector(".search-story").addEventListener("input", async (e) => {
   const keyword = e.target.value;
@@ -263,7 +124,7 @@ document.querySelectorAll(".dropdown-item").forEach((item) => {
 
     // Fetch dữ liệu truyện từ backend
     try {
-      const response = await fetch(`/stories/${category}`);
+      const response = await fetch(`/stories/${category}?page=${1}`);
       const data = await response.json();
 
       if (data) {
@@ -587,71 +448,104 @@ document.querySelectorAll(".category-name").forEach((item) => {
 
 // page category
 
+function updatePagination() {
+    const paginationContainer = document.getElementById("pagination");
+    paginationContainer.innerHTML = ""; // Xóa các nút cũ
+
+    const createPageButton = (page) => {
+        const btn = document.createElement("button");
+        btn.textContent = page;
+        if (page === currentPage) {
+            btn.disabled = true;
+            btn.style.fontWeight = "bold";
+        }
+        btn.addEventListener("click", () => loadPage(page));
+        return btn;
+    };
+
+    // Thêm nút "Trang trước"
+    if (currentPage > 1) {
+        const prevBtn = document.createElement("button");
+        prevBtn.textContent = "«";
+        prevBtn.addEventListener("click", () => loadPage(currentPage - 1));
+        paginationContainer.appendChild(prevBtn);
+    }
+
+    // Tính trang bắt đầu và kết thúc để hiển thị
+    let startPage = Math.max(currentPage - 1, 1);
+    let endPage = Math.min(startPage + 2, totalPages);
+    if (endPage - startPage < 2) {
+        startPage = Math.max(endPage - 2, 1);
+    }
+
+    // Nếu có trang đầu mà không hiển thị, thêm nút 1 và ...
+    if (startPage > 1) {
+        paginationContainer.appendChild(createPageButton(1));
+        if (startPage > 2) {
+            const dots = document.createElement("span");
+            dots.textContent = "...";
+            dots.style.margin = "0 5px";
+            paginationContainer.appendChild(dots);
+        }
+    }
+
+    // Các nút trang chính giữa
+    for (let i = startPage; i <= endPage; i++) {
+        paginationContainer.appendChild(createPageButton(i));
+    }
+
+    // Nếu còn trang cuối mà chưa hiển thị, thêm ... và trang cuối
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            const dots = document.createElement("span");
+            dots.textContent = "...";
+            dots.style.margin = "0 5px";
+            paginationContainer.appendChild(dots);
+        }
+        paginationContainer.appendChild(createPageButton(totalPages));
+    }
+
+    // Nút "Trang sau"
+    if (currentPage < totalPages) {
+        const nextBtn = document.createElement("button");
+        nextBtn.textContent = "»";
+        nextBtn.addEventListener("click", () => loadPage(currentPage + 1));
+        paginationContainer.appendChild(nextBtn);
+    }
+}
+
+currentPage = 1;
+totalPages = 1;
+
+async function loadPage(page) {
+    currentPage = page;
+	const categoryId = JSON.parse(localStorage.getItem('idtl'));
+    const res = await fetch(`/stories/${categoryId}?page=${page}`);
+    const storyData = await res.json();
+    fetchStories(storyData.stories);
+    updatePagination();
+}
 document.addEventListener('DOMContentLoaded', async function () {
     try {
-        const response = localStorage.getItem('stories');
-        const nameTl = JSON.parse(localStorage.getItem('TheLoai'));
-        console.log("truyện lấy được:", response);
-        document.getElementById('selected-category').textContent = nameTl;
-        if (response) {
-            const data = JSON.parse(response);
-            console.log("stories: ", data);
+        const categoryId = JSON.parse(localStorage.getItem('idtl'));
+        const selectedCategory = JSON.parse(localStorage.getItem('TheLoai'));
+        document.getElementById('selected-category').textContent = selectedCategory;
 
-            if (data.length > 0) {
-                console.log("Có data gửi lên");
+        const countResponse = await fetch(`/count-stories-of-category/${categoryId}`);
+        const totalCount = await countResponse.json();
+        const storiesPerPage = 1;
+        totalPages = Math.ceil(totalCount / storiesPerPage); 
 
-				let currentPage = 1;
-				                const storiesPerPage = 10; // Giới hạn 10 truyện mỗi trang
-				                const totalPages = Math.ceil(data.length / storiesPerPage);
+        currentPage = 1;
 
-				                function displayStories(page) {
-				                    const startIndex = (page - 1) * storiesPerPage;
-				                    const endIndex = Math.min(startIndex + storiesPerPage, data.length);
-				                    const storiesToDisplay = data.slice(startIndex, endIndex);
+        
+        // Gọi trang đầu tiên
+        await loadPage(currentPage);
 
-				                    fetchStories(storiesToDisplay); // Hiển thị danh sách truyện của trang hiện tại
-				                    updatePagination();
-				                }
-
-				                function updatePagination() {
-				                    const prevButton = document.getElementById("prevPage");
-				                    const nextButton = document.getElementById("nextPage");
-				                    const pageIndicator = document.getElementById("pageIndicator");
-
-				                    pageIndicator.textContent = `Trang ${currentPage} / ${totalPages}`;
-
-				                    prevButton.disabled = currentPage === 1;
-				                    nextButton.disabled = currentPage === totalPages;
-
-				                    prevButton.onclick = () => {
-				                        if (currentPage > 1) {
-				                            currentPage--;
-				                            displayStories(currentPage);
-				                        }
-				                    };
-
-				                    nextButton.onclick = () => {
-				                        if (currentPage < totalPages) {
-				                            currentPage++;
-				                            displayStories(currentPage);
-				                        }
-				                    };
-				                }
-
-				                displayStories(currentPage); // Hiển thị trang đầu tiên
-				            } else {
-				                const storyList = document.getElementById("story-list");
-				                const messageElement = document.createElement("div");
-				                messageElement.textContent = "Không có truyện của thể loại này!";
-				                storyList.appendChild(messageElement);
-				            }
-				        } else {
-				            console.error("Không có dữ liệu trong localStorage");
-				        }
-				    } catch (error) {
-				        console.error("Lỗi khi lấy dữ liệu từ localStorage:", error);
-				    }
-				});
+    } catch (error) {
+        console.error("Lỗi:", error);
+    }
+});
 //tmp
     
 	
